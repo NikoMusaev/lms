@@ -165,6 +165,56 @@ describe('loadMobileNavLinks', () => {
 		expect(labels(otherLinks)).toEqual(['Log in'])
 	})
 
+	// The admin's sidebar web pages. The desktop sidebar draws them under its own
+	// heading; the phone had no place for them at all, so a site that put its
+	// own pages there left phone users with no way to reach them.
+	const WEB_PAGES = [
+		{ label: 'Connect agent', icon: 'bot', to: 'agent-sidebar' },
+		{ label: 'Study in browser', icon: 'message-circle', to: 'study-in-browser' },
+	]
+
+	it('lists the admin sidebar pages on the You page, not on the bar', async () => {
+		settings.data = { web_pages: structuredClone(WEB_PAGES) }
+		await loadMobileNavLinks(LEARNER)
+		expect(labels(otherLinks)).toEqual([
+			'Connect agent',
+			'Study in browser',
+			'Notifications',
+			'Profile',
+			'Log out',
+		])
+		expect(labels(sidebarLinks)).not.toContain('Connect agent')
+		// The path stays as the admin configured it: the You page turns a `to`
+		// that is not a route into `/<path>`, which Frappe serves itself.
+		expect(otherLinks.value[0]).toMatchObject({ icon: 'bot', to: 'agent-sidebar' })
+	})
+
+	it('puts the sidebar pages after the moderator extras', async () => {
+		settings.data = { web_pages: structuredClone(WEB_PAGES) }
+		await loadMobileNavLinks(MODERATOR)
+		expect(labels(otherLinks).slice(0, 5)).toEqual([
+			'Quizzes',
+			'Assignments',
+			'Programming Exercises',
+			'Connect agent',
+			'Study in browser',
+		])
+	})
+
+	it('offers no sidebar pages when guest access is revoked', async () => {
+		// A bare list is the "nothing is browsable" answer, and it carries no pages.
+		settings.data = []
+		await loadMobileNavLinks(GUEST)
+		expect(labels(otherLinks)).toEqual(['Log in'])
+	})
+
+	it('does not accumulate duplicate sidebar pages when loaded twice', async () => {
+		settings.data = { web_pages: structuredClone(WEB_PAGES) }
+		await loadMobileNavLinks(LEARNER)
+		await loadMobileNavLinks(LEARNER)
+		expect(labels(otherLinks).filter((l) => l === 'Connect agent')).toHaveLength(1)
+	})
+
 	it('does not accumulate duplicates when the settings change twice', async () => {
 		// `sidebarSettings.data` is watched deeply, so a settings save re-runs
 		// this whole load against state that is already populated.

@@ -124,6 +124,15 @@ export async function loadMobileNavLinks(
 		addLink(others, 'Programming Exercises', 'Code', 'ProgrammingExercises')
 	}
 
+	// The admin's sidebar web pages. The desktop sidebar draws them under their
+	// own heading; without this the phone had no place for them at all. Their
+	// `to` is a path Frappe serves, which the You page already turns into a link
+	// outside the SPA. A bare list means guest access is revoked and carries none.
+	const webPages = Array.isArray(visibility)
+		? []
+		: ((visibility as { web_pages?: NavLink[] }).web_pages ?? [])
+	for (const page of webPages) addLink(others, page.label, page.icon, page.to)
+
 	addSessionLinks(others, viewer)
 
 	// Last, and over both lists: the flags say what exists on this site, so they
