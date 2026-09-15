@@ -1,0 +1,77 @@
+name: High Time assets
+
+# Builds the SPA for the High Time stand and publishes it as a rolling release,
+# so a frontend change reaches the stand without rebuilding the bench image
+# (NikoMusaev/lms-platform#159). Separate from the upstream
+# build-and-commit-assets.yml: that one serves upstream branches, and keeping
+# ours apart avoids a conflict every time the fork is synced.
+#
+# The archive carries what the stand mounts as volumes: `frontend/` (the built
+# assets) and `www/` (the entry template the router points at), plus `rev.txt`
+# so the stand can say which revision it is serving.
+
+on:
+  push:
+    branches:
+      - high-time
+  workflow_dispatch:
+
+concurrency:
+  group: high-time-assets
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  assets:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    env:
+      # Vite builds of this SPA exceed Node's default heap and abort with
+      # "JavaScript heap out of memory" even on a runner with free RAM.
+      NODE_OPTIONS: --max-old-space-size=4096
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: apps/lms
+
+      - name: Create bench structure
+        run: |
+          mkdir -p sites
+          # frontend/src/socket imports socketio_port from this file at build time
+          echo '{"socketio_port": 9000}' > sites/common_site_config.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+          cache-dependency-path: apps/lms/yarn.lock
+
+      - name: Install JS dependencies
+        working-directory: apps/lms
+        run: yarn install --frozen-lockfile
+
+      - name: Build the SPA
+        working-directory: apps/lms
+        run: yarn build
+
+      - name: Package the assets
+        run: |
+          echo "$GITHUB_SHA" > rev.txt
+          tar czf lms-assets.tar.gz \
+            --exclude=__pycache__ \
+            -C "$GITHUB_WORKSPACE" rev.txt \
+            -C "$GITHUB_WORKSPACE/apps/lms/lms/public" frontend \
+            -C "$GITHUB_WORKSPACE/apps/lms/lms" www
+          ls -lh lms-assets.tar.gz
+
+      - name: Upload to the rolling release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="assets-high-time"
+          gh release create "$TAG" -R "$GITHUB_REPOSITORY" --prerelease \
+            --title "Assets: high-time" --notes "Built by CI from the branch head." 2>/dev/null || true
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" lms-assets.tar.gz --clobber
