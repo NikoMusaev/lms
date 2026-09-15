@@ -26,7 +26,10 @@ export const sessionStore = defineStore('lms-session', () => {
 		onSuccess() {
 			userResource.reset()
 			user.value = null
-			window.location.reload()
+			// To the site root rather than a reload: the page the visitor was on is
+			// usually not browsable by a guest, and a reload left them looking at
+			// an access error.
+			window.location.href = '/'
 		},
 	})
 
