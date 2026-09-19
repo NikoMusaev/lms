@@ -68,7 +68,7 @@
 				{{ __('Partly covered') }}
 			</span>
 			<span class="flex items-center gap-1">
-				<span class="legend border-outline-gray-3 border" aria-hidden="true" />
+				<span class="legend bg-surface-gray-2" aria-hidden="true" />
 				{{ __('Not yet') }}
 			</span>
 		</div>
@@ -116,10 +116,16 @@ function labelOf(lesson: MapLesson) {
 	return `${lesson.number}. ${lesson.title} — ${covered}/${lesson.objectives.length}`
 }
 
+/*
+ * Every state carries a background, never a border: the hexagon is a clip-path,
+ * and it cuts a border down to two vertical slivers where the sides ran. An
+ * outlined cell looked like a pair of sticks on the stand, while jsdom, which
+ * does not apply clip-path, showed the tests nothing wrong.
+ */
 function cellClass(state: string) {
 	if (state === 'full') return 'bg-surface-gray-7 text-ink-base'
 	if (state === 'partial') return 'hex-partial text-ink-gray-8'
-	return 'border-outline-gray-3 border text-ink-gray-6'
+	return 'bg-surface-gray-2 text-ink-gray-6'
 }
 
 function marker(objective: MapObjective) {

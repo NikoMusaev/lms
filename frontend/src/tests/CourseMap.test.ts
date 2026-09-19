@@ -98,6 +98,28 @@ describe('CourseMap', () => {
 		expect(label).toContain('2')
 	})
 
+	it('never draws a cell with a border, which clip-path would cut to pieces', () => {
+		// The hexagon is a clip-path, and it clips the border too: what is left
+		// on screen are two vertical slivers where the sides ran, not an
+		// outline. Every state has to carry its own background instead. This
+		// only showed on the stand — jsdom has no clip-path.
+		const map = mount(CourseMap, { props: { chapters }, global })
+		const guest = mount(CourseMap, {
+			props: { chapters: guestChapters },
+			global,
+		})
+
+		const classes = [
+			...map.findAll('[data-lesson]'),
+			...guest.findAll('[data-lesson]'),
+		].map((cell) => cell.attributes('class') || '')
+
+		expect(classes.filter((cls) => /\bborder\b/.test(cls))).toEqual([])
+		// Either a background utility or `hex-partial`, whose stripes are a
+		// background too — what matters is that the shape is painted, not outlined.
+		expect(classes.every((cls) => /\bbg-|hex-partial/.test(cls))).toBe(true)
+	})
+
 	it('falls back to the lesson number when the curator set no icon', () => {
 		const map = mount(CourseMap, { props: { chapters }, global })
 
