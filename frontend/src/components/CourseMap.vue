@@ -94,11 +94,11 @@ const props = defineProps<{ chapters: MapChapter[] }>()
 const opened = ref<string | null>(null)
 
 const lessons = computed<MapLesson[]>(() =>
-	props.chapters.flatMap((chapter) => chapter.lessons),
+	props.chapters.flatMap((chapter) => chapter.lessons)
 )
 
 const openedLesson = computed<MapLesson | undefined>(() =>
-	lessons.value.find((lesson) => lesson.id === opened.value),
+	lessons.value.find((lesson) => lesson.id === opened.value)
 )
 
 function stateOf(lesson: MapLesson) {
@@ -111,7 +111,7 @@ function stateOf(lesson: MapLesson) {
  */
 function labelOf(lesson: MapLesson) {
 	const covered = lesson.objectives.filter(
-		(objective) => objective.status === 'covered',
+		(objective) => objective.status === 'covered'
 	).length
 	return `${lesson.number}. ${lesson.title} — ${covered}/${lesson.objectives.length}`
 }
