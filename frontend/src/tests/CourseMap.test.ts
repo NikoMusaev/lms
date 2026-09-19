@@ -89,6 +89,48 @@ describe('CourseMap', () => {
 		expect(map.find('[data-objectives]').exists()).toBe(false)
 	})
 
+	it('places cells by the shared arithmetic, so a honeycomb interlocks', () => {
+		// flex-wrap leaves gaps and keeps every row aligned; the cells then read
+		// as a grid of hexagons rather than a honeycomb. Positions come from
+		// hexPosition so that odd rows shift by half a cell.
+		const map = mount(CourseMap, { props: { chapters }, global })
+
+		const styles = map
+			.findAll('[data-lesson]')
+			.map((cell) => cell.attributes('style') || '')
+
+		expect(
+			styles.every((style) => /left:/.test(style) && /top:/.test(style))
+		).toBe(true)
+	})
+
+	it('carries a short caption in the cell, so the map is readable without hovering', () => {
+		const map = mount(CourseMap, { props: { chapters }, global })
+
+		expect(map.find('[data-lesson="lesson-1"]').text()).toContain(
+			'Starting a project'
+		)
+	})
+
+	it('shows the objectives on hover as well as on click', async () => {
+		const map = mount(CourseMap, { props: { chapters }, global })
+
+		await map.find('[data-lesson="lesson-1"]').trigger('mouseenter')
+		expect(map.find('[data-objectives]').text()).toContain('Name the sponsor')
+
+		await map.find('[data-lesson="lesson-1"]').trigger('mouseleave')
+		expect(map.find('[data-objectives]').exists()).toBe(false)
+	})
+
+	it('keeps a clicked cell open when the pointer leaves, for phones without hover', async () => {
+		const map = mount(CourseMap, { props: { chapters }, global })
+
+		await map.find('[data-lesson="lesson-2"]').trigger('click')
+		await map.find('[data-lesson="lesson-2"]').trigger('mouseleave')
+
+		expect(map.find('[data-objectives]').text()).toContain('Run a daily check')
+	})
+
 	it('labels a cell with the lesson and its progress, not with colour alone', () => {
 		const map = mount(CourseMap, { props: { chapters }, global })
 

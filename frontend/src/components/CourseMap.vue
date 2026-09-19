@@ -1,5 +1,5 @@
 <template>
-	<div v-if="lessons.length" class="course-map">
+	<div v-if="lessons.length" ref="root" class="course-map">
 		<div
 			v-for="chapter in chapters"
 			:key="chapter.title"
@@ -8,28 +8,36 @@
 			<h3 class="text-ink-gray-7 mb-3 text-base font-semibold">
 				{{ chapter.title }}
 			</h3>
-			<div class="flex flex-wrap gap-2">
+			<div class="relative" :style="{ height: chapterHeight(chapter) }">
 				<button
-					v-for="lesson in chapter.lessons"
+					v-for="(lesson, index) in chapter.lessons"
 					:key="lesson.id"
 					:data-lesson="lesson.id"
 					:data-state="stateOf(lesson)"
 					:aria-label="labelOf(lesson)"
-					:aria-expanded="opened === lesson.id"
+					:aria-expanded="openedId === lesson.id"
+					:style="cellStyle(index)"
 					type="button"
-					class="hex flex items-center justify-center"
+					class="hex absolute flex flex-col items-center justify-center gap-1 px-2 text-center"
 					:class="[
 						cellClass(stateOf(lesson)),
-						opened === lesson.id ? 'ring-2 ring-outline-gray-4' : '',
+						pinned === lesson.id ? 'ring-outline-gray-4 ring-2' : '',
 					]"
-					@click="toggle(lesson.id)"
+					@click="pin(lesson.id)"
+					@mouseenter="hovered = lesson.id"
+					@mouseleave="hovered = null"
+					@focus="hovered = lesson.id"
+					@blur="hovered = null"
 				>
 					<span
 						v-if="lesson.icon"
-						:class="`lucide-${lesson.icon} size-5`"
+						:class="`lucide-${lesson.icon} size-4`"
 						aria-hidden="true"
 					/>
-					<span v-else class="text-lg font-semibold">{{ lesson.number }}</span>
+					<span v-else class="text-sm font-semibold">{{ lesson.number }}</span>
+					<span class="caption text-[0.6rem] leading-tight">
+						{{ lesson.title }}
+					</span>
 				</button>
 			</div>
 		</div>
@@ -76,8 +84,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { cellState, type MapObjective } from '@/utils/courseMap'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { cellState, hexPosition, type MapObjective } from '@/utils/courseMap'
 
 type MapLesson = {
 	id: string
@@ -91,15 +99,62 @@ type MapChapter = { title: string; lessons: MapLesson[] }
 
 const props = defineProps<{ chapters: MapChapter[] }>()
 
-const opened = ref<string | null>(null)
+/** Cell box in pixels: taller than wide, the proportions of a pointy-top hexagon. */
+const CELL_WIDTH = 96
+const CELL_HEIGHT = 108
+
+const root = ref<HTMLElement | null>(null)
+const columns = ref(3)
+const pinned = ref<string | null>(null)
+const hovered = ref<string | null>(null)
+
+let observer: ResizeObserver | null = null
+
+onMounted(() => {
+	const measure = () => {
+		const width = root.value?.clientWidth || 0
+		// Two is the floor: a single column is a list, and the outline below is
+		// already a list.
+		columns.value = Math.max(2, Math.floor(width / CELL_WIDTH))
+	}
+	measure()
+	if (typeof ResizeObserver !== 'undefined' && root.value) {
+		observer = new ResizeObserver(measure)
+		observer.observe(root.value)
+	}
+})
+
+onBeforeUnmount(() => observer?.disconnect())
 
 const lessons = computed<MapLesson[]>(() =>
 	props.chapters.flatMap((chapter) => chapter.lessons)
 )
 
+/**
+ * A pinned cell wins over a hovered one: a phone has no hover, so a tap has to
+ * keep the objectives open while the reader actually reads them.
+ */
+const openedId = computed<string | null>(() => pinned.value || hovered.value)
+
 const openedLesson = computed<MapLesson | undefined>(() =>
-	lessons.value.find((lesson) => lesson.id === opened.value)
+	lessons.value.find((lesson) => lesson.id === openedId.value)
 )
+
+function cellStyle(index: number) {
+	const { x, y } = hexPosition(index, columns.value)
+	return {
+		left: `${x * CELL_WIDTH}px`,
+		top: `${y * CELL_HEIGHT}px`,
+		width: `${CELL_WIDTH}px`,
+		height: `${CELL_HEIGHT}px`,
+	}
+}
+
+function chapterHeight(chapter: MapChapter) {
+	const rows = Math.ceil(chapter.lessons.length / columns.value)
+	// Rows interlock: each one above the last covers a quarter of the next.
+	return `${(rows - 1) * 0.75 * CELL_HEIGHT + CELL_HEIGHT}px`
+}
 
 function stateOf(lesson: MapLesson) {
 	return cellState(lesson.objectives)
@@ -120,7 +175,7 @@ function labelOf(lesson: MapLesson) {
  * Every state carries a background, never a border: the hexagon is a clip-path,
  * and it cuts a border down to two vertical slivers where the sides ran. An
  * outlined cell looked like a pair of sticks on the stand, while jsdom, which
- * does not apply clip-path, showed the tests nothing wrong.
+ * applies no clip-path, showed the tests nothing wrong.
  */
 function cellClass(state: string) {
 	if (state === 'full') return 'bg-surface-gray-7 text-ink-base'
@@ -134,8 +189,8 @@ function marker(objective: MapObjective) {
 	return '○'
 }
 
-function toggle(lesson: string) {
-	opened.value = opened.value === lesson ? null : lesson
+function pin(lesson: string) {
+	pinned.value = pinned.value === lesson ? null : lesson
 }
 </script>
 
@@ -145,8 +200,6 @@ function toggle(lesson: string) {
  * a button, so focus, keyboard and hit-testing keep working for free.
  */
 .hex {
-	width: 4.5rem;
-	height: 5rem;
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
@@ -163,6 +216,14 @@ function toggle(lesson: string) {
 	);
 }
 
+/* Three lines of a title is all a cell this size can hold honestly. */
+.caption {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
 .legend {
 	width: 0.75rem;
 	height: 0.75rem;
@@ -176,12 +237,5 @@ function toggle(lesson: string) {
 		var(--surface-gray-4) 0 3px,
 		var(--surface-gray-2) 3px 6px
 	);
-}
-
-@media (max-width: 640px) {
-	.hex {
-		width: 3.5rem;
-		height: 4rem;
-	}
 }
 </style>
