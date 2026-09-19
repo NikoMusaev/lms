@@ -47,6 +47,7 @@ declare module 'vue' {
     CourseDetailsSection: typeof import('./src/components/Courses/CourseDetailsSection.vue')['default']
     CourseInstructors: typeof import('./src/components/CourseInstructors.vue')['default']
     CourseInstructorsField: typeof import('./src/components/Courses/CourseInstructorsField.vue')['default']
+    CourseMap: typeof import('./src/components/CourseMap.vue')['default']
     CourseOutline: typeof import('./src/components/CourseOutline.vue')['default']
     CourseOverviewSection: typeof import('./src/components/Courses/CourseOverviewSection.vue')['default']
     CourseReviews: typeof import('./src/components/CourseReviews.vue')['default']
