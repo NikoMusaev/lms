@@ -87,6 +87,15 @@
 					</div>
 				</section>
 
+				<section v-if="hasCourseMap">
+					<h2 class="text-3xl-semibold text-ink-gray-9 mb-4">
+						{{ __('Course map') }}
+					</h2>
+					<div class="border rounded-md p-4">
+						<CourseMap :chapters="courseMap.data.data.chapters" />
+					</div>
+				</section>
+
 				<section>
 					<div class="flex items-baseline justify-between gap-4 mb-4">
 						<h2 class="text-3xl-semibold text-ink-gray-9">
@@ -160,6 +169,7 @@ import type {
 } from '@/types'
 import CourseCardOverlay from '@/components/CourseCardOverlay.vue'
 import CourseOutline from '@/components/CourseOutline.vue'
+import CourseMap from '@/components/CourseMap.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import CourseReviews from '@/components/CourseReviews.vue'
 import CourseInstructors from '@/components/CourseInstructors.vue'
@@ -197,6 +207,33 @@ watch(
 		if (name) outline.fetch()
 	},
 	{ immediate: true }
+)
+
+// The map comes from our own app: Learning knows nothing about objectives or
+// their coverage. Same timing rule as the outline above — `auto: false` plus a
+// watch, because firing before the course name arrives sends `undefined` and
+// the server answers 500.
+const courseMap = createResource({
+	url: 'lms_frappe_app.api.public.course_map',
+	makeParams() {
+		return { course: props.course.data?.name }
+	},
+	auto: false,
+}) as Resource<{ data: { chapters: unknown[] } } | null>
+
+watch(
+	() => props.course.data?.name,
+	(name) => {
+		if (name) courseMap.fetch()
+	},
+	{ immediate: true }
+)
+
+// A course with no directives has no objectives to show, and an empty
+// honeycomb next to a full outline reads as a broken page rather than an empty
+// one. The map appears only when there is something in it.
+const hasCourseMap = computed<boolean>(() =>
+	Boolean(courseMap.data?.data?.chapters?.length)
 )
 
 const outlineStats = computed(() => {

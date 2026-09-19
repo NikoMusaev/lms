@@ -79,6 +79,9 @@ vi.mock('@/components/UserAvatar.vue', () => ({
 vi.mock('@/components/RelatedCourses.vue', () => ({
 	default: { template: '<div />' },
 }))
+vi.mock('@/components/CourseMap.vue', () => ({
+	default: { template: '<div />' },
+}))
 
 vi.stubGlobal('__', (s: string) => s)
 
@@ -136,5 +139,34 @@ describe('CourseOverview outline resource', () => {
 		mountOverview(reactive({ data: null }))
 
 		expect(outlineResource().cache).toBeUndefined()
+	})
+})
+
+describe('CourseOverview course map resource', () => {
+	// The map comes from our own app, not from Learning: it is the only place
+	// the page can get objectives and their coverage, and a guest is allowed to
+	// see it. It must follow the same timing rule as the outline — firing with
+	// an undefined course name is what produced the 500 this suite exists for.
+	const mapResource = () =>
+		resources.find((r) => r.url === 'lms_frappe_app.api.public.course_map')!
+
+	it('does not fire while the parent course resource is still loading', () => {
+		mountOverview(reactive({ data: null }))
+
+		const map = mapResource()
+		expect(map.auto).toBe(false)
+		expect(map.fetch).not.toHaveBeenCalled()
+	})
+
+	it('fires once the course name arrives, with the real course in params', async () => {
+		const course = reactive<{ data: { name: string } | null }>({ data: null })
+		mountOverview(course)
+
+		course.data = { name: 'COURSE-1' }
+		await nextTick()
+
+		const map = mapResource()
+		expect(map.fetch).toHaveBeenCalledTimes(1)
+		expect(map.makeParams!()).toEqual({ course: 'COURSE-1' })
 	})
 })
