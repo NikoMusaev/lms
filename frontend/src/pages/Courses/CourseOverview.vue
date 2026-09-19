@@ -215,6 +215,9 @@ watch(
 // the server answers 500.
 const courseMap = createResource({
 	url: 'lms_frappe_app.api.public.course_map',
+	// GET, not the default POST: the endpoint is whitelisted for GET only and
+	// answers 403 to anything else. It reads, so GET is also what it means.
+	method: 'GET',
 	makeParams() {
 		return { course: props.course.data?.name }
 	},

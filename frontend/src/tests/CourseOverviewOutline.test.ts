@@ -169,4 +169,14 @@ describe('CourseOverview course map resource', () => {
 		expect(map.fetch).toHaveBeenCalledTimes(1)
 		expect(map.makeParams!()).toEqual({ course: 'COURSE-1' })
 	})
+
+	it('asks over GET, which is the only verb the endpoint answers', () => {
+		// The whitelist on the server side is GET-only, and createResource
+		// defaults to POST: the stand answered 403 to every request until this
+		// was set. Server tests call the function directly and these tests mock
+		// the resource, so nothing else covers the verb between them.
+		mountOverview(reactive({ data: null }))
+
+		expect(mapResource().method).toBe('GET')
+	})
 })
