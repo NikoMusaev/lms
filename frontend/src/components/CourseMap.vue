@@ -35,7 +35,7 @@
 						aria-hidden="true"
 					/>
 					<span v-else class="text-sm font-semibold">{{ lesson.number }}</span>
-					<span class="caption text-[0.6rem] leading-tight">
+					<span class="caption text-[0.7rem] leading-tight">
 						{{ lesson.title }}
 					</span>
 				</button>
@@ -99,9 +99,13 @@ type MapChapter = { title: string; lessons: MapLesson[] }
 
 const props = defineProps<{ chapters: MapChapter[] }>()
 
-/** Cell box in pixels: taller than wide, the proportions of a pointy-top hexagon. */
-const CELL_WIDTH = 96
-const CELL_HEIGHT = 108
+/**
+ * Cell box in pixels: taller than wide, the proportions of a pointy-top hexagon.
+ * Sized by the caption rather than the icon — at 96px a lesson title was three
+ * clipped lines of 10px text, which is a decoration, not a label.
+ */
+const CELL_WIDTH = 128
+const CELL_HEIGHT = 144
 
 const root = ref<HTMLElement | null>(null)
 const columns = ref(3)
