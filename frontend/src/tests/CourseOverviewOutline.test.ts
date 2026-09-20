@@ -37,7 +37,9 @@ vi.mock('frappe-ui', () => ({
 			...opts,
 			data: null,
 			loading: false,
-			fetch: vi.fn(),
+			// The real fetch() returns a promise; a double that returns undefined
+			// hides every mistake in how its result is handled.
+			fetch: vi.fn(() => Promise.resolve()),
 			reload: vi.fn(),
 		}
 		resources.push(resource)
@@ -168,6 +170,32 @@ describe('CourseOverview course map resource', () => {
 		const map = mapResource()
 		expect(map.fetch).toHaveBeenCalledTimes(1)
 		expect(map.makeParams!()).toEqual({ course: 'COURSE-1' })
+	})
+
+	it('handles a failing request, because the app it calls may not be installed', async () => {
+		// frappe-ui's createResource rethrows in handleError unconditionally, so
+		// whatever fetch() returns has to be handled here. On a Learning site
+		// without lms_frappe_app the server answers AppNotInstalledError, and
+		// that unhandled rejection took down three Cypress specs — every one
+		// that opens a course page. A site without our app must show no map,
+		// quietly.
+		const course = reactive<{ data: { name: string } | null }>({ data: null })
+		mountOverview(course)
+
+		let handled = false
+		const map = mapResource()
+		map.fetch.mockImplementationOnce(() => ({
+			catch: (handler: (error: unknown) => void) => {
+				handled = true
+				handler(new Error('AppNotInstalledError'))
+				return Promise.resolve()
+			},
+		}))
+
+		course.data = { name: 'COURSE-1' }
+		await nextTick()
+
+		expect(handled).toBe(true)
 	})
 
 	it('asks over GET, which is the only verb the endpoint answers', () => {
