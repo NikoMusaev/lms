@@ -227,7 +227,12 @@ const courseMap = createResource({
 watch(
 	() => props.course.data?.name,
 	(name) => {
-		if (name) courseMap.fetch()
+		// The rejection has to be handled here: createResource rethrows in
+		// handleError no matter what, and a Learning site without
+		// lms_frappe_app answers AppNotInstalledError. Unhandled, it surfaces
+		// as an application error on every course page — which is exactly how
+		// it took down three Cypress specs. No app, no map, no noise.
+		if (name) courseMap.fetch().catch(() => {})
 	},
 	{ immediate: true }
 )
