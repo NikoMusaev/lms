@@ -867,10 +867,14 @@ def get_sidebar_settings():
 		sidebar_items[item] = lms_settings.get(item)
 
 	if len(lms_settings.sidebar_items):
+		# In the table's own order. Without it the default order is newest first,
+		# and the order an admin sets in LMS Settings never reached the sidebar
+		# (learning-services#310).
 		web_pages = frappe.get_all(
 			"LMS Sidebar Item",
 			{"parenttype": "LMS Settings", "parentfield": "sidebar_items"},
 			["web_page", "route", "title as label", "icon", "name"],
+			order_by="idx asc",
 		)
 		for page in web_pages:
 			page.to = page.route
