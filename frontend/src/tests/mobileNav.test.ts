@@ -80,7 +80,8 @@ describe('pickPrimaryTabs', () => {
 })
 
 describe('pickPrimaryTabs for a signed-out visitor', () => {
-	const guestLabels = ['Courses', 'Batches', 'Jobs', 'Statistics', 'Log in']
+	// No Statistics: site-wide counts are an admin's view (learning-services#310).
+	const guestLabels = ['Courses', 'Batches', 'Jobs', 'Log in']
 
 	it('shows the whole bar before any sidebar link has loaded', () => {
 		// Regression: the guest bar used to be matched out of `sidebarLinks`,
@@ -102,7 +103,6 @@ describe('pickPrimaryTabs for a signed-out visitor', () => {
 		const visibility = { courses: 1, batches: 0, jobs: 0, statistics: 1 }
 		expect(pickPrimaryTabs([], false, visibility).map((t) => t.label)).toEqual([
 			'Courses',
-			'Statistics',
 			'Log in',
 		])
 	})
@@ -164,7 +164,6 @@ describe('pickPrimaryTabs for a signed-out visitor', () => {
 			'Courses',
 			'Batches',
 			'Jobs',
-			'Statistics',
 		])
 	})
 })

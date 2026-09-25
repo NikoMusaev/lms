@@ -29,6 +29,24 @@
 					v-model="payment"
 					:onCreate="openPaymentSettings"
 				/>
+				<!-- Enrolling here gives access and nothing else. A client company's
+				employee comes in through a course allocation, which adds the
+				deadline, the company's quiz policy and the manager's report — and the
+				report is built from allocations, so an employee enrolled here never
+				shows up in it (learning-services#310). -->
+				<p
+					data-testid="course-enrollment-allocation-hint"
+					class="text-p-sm text-ink-gray-6"
+				>
+					{{
+						__(
+							"For a client company's employee, allocate the course instead: that adds the deadline and puts them in the manager's report."
+						)
+					}}
+					<a :href="safeUrl(allocationUrl)" class="text-ink-gray-8 underline">{{
+						__('Allocate the course')
+					}}</a>
+				</p>
 			</div>
 		</template>
 		<template #actions>
@@ -58,6 +76,7 @@ import { computed, inject, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { openSettings } from '@/utils'
 import Link from '@/components/Controls/Link.vue'
+import { safeUrl } from '@/utils/safeUrl'
 import FormShell from '@/components/FormShell.vue'
 import HeaderButton from '@/components/HeaderButton.vue'
 import { useFormRoute } from '@/composables/useFormRoute'
@@ -72,6 +91,13 @@ import { resourceErrorMessage, submitResource } from '@/utils/resource'
 const props = defineProps<{
 	courseName: string
 }>()
+
+// lms_frappe_app's allocation form, with this course already filled in: the
+// desk takes field values from the query string of a new document.
+const allocationUrl = computed(
+	() =>
+		`/desk/course-allocation/new?course=${encodeURIComponent(props.courseName)}`
+)
 
 const user = inject<SessionUser>('$user')!
 const route = useRoute()

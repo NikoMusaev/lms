@@ -92,8 +92,27 @@
 					</Button>
 				</router-link>
 			</template>
+			<!-- The course as the curator's agent assembled it, with the notes on it,
+			lives in lms_frappe_app's author view, not in this editor
+			(learning-services#310). -->
+			<a
+				v-if="tab?.key === 'overview' && course.data && !isMobile"
+				:href="
+					safeUrl(`/author?course=${encodeURIComponent(props.courseName)}`)
+				"
+			>
+				<Button variant="outline">
+					<template #prefix>
+						<span class="lucide-pen-line size-4" />
+					</template>
+					{{ __('Author view') }}
+				</Button>
+			</a>
+			<!-- Enrol and publish sit on the overview too: it is the tab a course
+			opens on, and an admin looked for them there first
+			(learning-services#310). -->
 			<Button
-				v-if="tab?.key === 'dashboard' && course.data && isMobile"
+				v-if="enrollsHere(tab) && course.data && isMobile"
 				variant="outline"
 				class="!size-9"
 				:tooltip="__('Enroll')"
@@ -104,7 +123,7 @@
 				</template>
 			</Button>
 			<Button
-				v-else-if="tab?.key === 'dashboard' && course.data"
+				v-else-if="enrollsHere(tab) && course.data"
 				variant="outline"
 				@click="openEnrollForm()"
 			>
@@ -114,7 +133,7 @@
 				{{ __('Enroll') }}
 			</Button>
 			<Button
-				v-if="tab?.key === 'settings' && user.data?.is_moderator && !isMobile"
+				v-if="publishesHere(tab) && user.data?.is_moderator && !isMobile"
 				:variant="course.data?.published ? 'outline' : 'solid'"
 				:theme="course.data?.published ? 'red' : 'gray'"
 				:loading="publishToggle.loading"
@@ -238,6 +257,7 @@ import LessonHelp from '@/components/LessonHelp.vue'
 import ShortcutTooltip from '@/components/ShortcutTooltip.vue'
 import HeaderButton from '@/components/HeaderButton.vue'
 import { openFormRoute } from '@/composables/useFormRoute'
+import { safeUrl } from '@/utils/safeUrl'
 import type {
 	CourseDetails,
 	CourseInstructorInfo,
@@ -371,6 +391,13 @@ const course = createResource({
 	},
 	auto: true,
 }) as Resource<CourseDetails | null>
+
+// Header actions by tab. Enrolling and publishing also live on the overview,
+// the tab a course opens on (learning-services#310).
+const enrollsHere = (tab?: { key: string }) =>
+	['overview', 'dashboard'].includes(tab?.key ?? '')
+const publishesHere = (tab?: { key: string }) =>
+	['overview', 'settings'].includes(tab?.key ?? '')
 
 const tabs = computed<DetailTab[]>(() => [
 	{

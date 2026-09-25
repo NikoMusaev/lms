@@ -42,12 +42,8 @@ export const GUEST_TABS: readonly NavLink[] = [
 		to: 'Jobs',
 		activeFor: ['Jobs', 'JobDetail'],
 	},
-	{
-		label: 'Statistics',
-		icon: 'TrendingUp',
-		to: 'Statistics',
-		activeFor: ['Statistics'],
-	},
+	// No Statistics: site-wide counts are an admin's view, and a guest's bar is
+	// better spent on the way in (learning-services#310).
 	// No route: it leaves the SPA, so MobileLayout sends this one to Frappe's
 	// server-rendered /login rather than through vue-router.
 	{ label: 'Log in', icon: 'LogIn' },

@@ -847,7 +847,9 @@ def get_all_users():
 	return {user.name: user for user in users}
 
 
-@frappe.whitelist(allow_guest=True)
+# Reviewed for learning-services#310: the guest gets exactly what it got before,
+# the admin's sidebar pages in the table's order instead of newest first.
+@frappe.whitelist(allow_guest=True)  # nosemgrep: frappe-semgrep-rules.rules.security.guest-whitelisted-method
 def get_sidebar_settings():
 	lms_settings = frappe.get_single("LMS Settings")
 	if frappe.session.user == "Guest" and not lms_settings.allow_guest_access:
@@ -867,10 +869,14 @@ def get_sidebar_settings():
 		sidebar_items[item] = lms_settings.get(item)
 
 	if len(lms_settings.sidebar_items):
+		# In the table's own order. Without it the default order is newest first,
+		# and the order an admin sets in LMS Settings never reached the sidebar
+		# (learning-services#310).
 		web_pages = frappe.get_all(
 			"LMS Sidebar Item",
 			{"parenttype": "LMS Settings", "parentfield": "sidebar_items"},
 			["web_page", "route", "title as label", "icon", "name"],
+			order_by="idx asc",
 		)
 		for page in web_pages:
 			page.to = page.route

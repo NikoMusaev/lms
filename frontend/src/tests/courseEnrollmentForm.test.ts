@@ -207,6 +207,19 @@ describe('CourseEnrollmentForm as a route', () => {
 		expect(wrapper.html()).toContain('Enroll a Student')
 	})
 
+	// Enrolling here gives access only; a company employee belongs in a course
+	// allocation, or they never reach the manager's report (learning-services#310).
+	it('points a company employee to the allocation form for this course', async () => {
+		const router = makeRouter()
+		await openForm(router)
+		const wrapper = await mountForm(router)
+
+		const link = wrapper.get('[data-testid="course-enrollment-allocation-hint"] a')
+		expect(link.attributes('href')).toBe(
+			'/desk/course-allocation/new?course=COURSE-1'
+		)
+	})
+
 	it('fetches the course itself, keyed off the route param', async () => {
 		const router = makeRouter()
 		await openForm(router)
