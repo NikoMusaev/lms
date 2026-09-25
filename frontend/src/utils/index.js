@@ -564,6 +564,12 @@ const getSidebarItems = (forMobile = false) => {
 					icon: 'TrendingUp',
 					to: 'Statistics',
 					activeFor: ['Statistics'],
+					// Site-wide counts: a way to watch the platform, not a place a
+					// student learns anything, and it pushed the student's own
+					// pages further down (learning-services#310).
+					condition: () => {
+						return isAdmin()
+					},
 				},
 				{
 					label: 'Contact Us',

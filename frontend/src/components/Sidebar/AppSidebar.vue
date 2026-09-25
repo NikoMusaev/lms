@@ -634,12 +634,10 @@ const articles = ref([
 ])
 
 const setUpOnboarding = () => {
-	if (userResource.data?.is_system_manager) {
-		onboardingDetails = useOnboarding('learning')
-		onboardingDetails.setUp(steps)
-		isOnboardingStepsCompleted = onboardingDetails.isOnboardingStepsCompleted
-		showOnboarding.value = true
-	}
+	// Deliberately empty. Frappe Learning's getting-started walks through
+	// batches and a hand-built first course; here courses are assembled by the
+	// curator's agent and batches are switched off, so the panel covered a third
+	// of every page with steps that do not apply (learning-services#310).
 }
 
 watch(userResource, async () => {

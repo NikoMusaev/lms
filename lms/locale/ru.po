@@ -9932,3 +9932,55 @@ msgstr "Есть свой AI-агент?"
 #: frontend/src/components/LessonEntry.vue
 msgid "Connect it"
 msgstr "Подключите его"
+
+#: frontend/src/pages/Courses/CourseDetail.vue
+msgid "Author view"
+msgstr "Кабинет автора"
+
+#: frontend/src/pages/Forms/CourseEnrollmentForm.vue
+msgid "For a client company's employee, allocate the course instead: that adds the deadline and puts them in the manager's report."
+msgstr "Сотрудника компании-клиента назначайте через назначение курса: так у него будет дедлайн и он попадёт в отчёт руководителя."
+
+#: frontend/src/pages/Forms/CourseEnrollmentForm.vue
+msgid "Allocate the course"
+msgstr "Назначить курс"
+
+#: frontend/src/pages/MobileYou.vue
+msgid "You"
+msgstr "Вы"
+
+#: frontend/src/components/Settings/youRows.ts
+msgid "Pages"
+msgstr "Страницы"
+
+#: frontend/src/pages/MobileYou.vue
+msgid "View profile"
+msgstr "Открыть профиль"
+
+#: frontend/src/components/Settings/mobileSettings.ts
+msgid "Colour mode"
+msgstr "Тема"
+
+#: frontend/src/components/Settings/mobileSettings.ts
+msgid "System"
+msgstr "Как в системе"
+
+#: frontend/src/components/Settings/mobileSettings.ts
+msgid "Light"
+msgstr "Светлая"
+
+#: frontend/src/components/Settings/mobileSettings.ts
+msgid "Dark"
+msgstr "Тёмная"
+
+#: frontend/src/utils/mobileNav.ts
+msgid "Log in"
+msgstr "Войти"
+
+#: frontend/src/pages/Lesson.vue
+msgid "Previous lesson"
+msgstr "Предыдущий урок"
+
+#: frontend/src/pages/Lesson.vue
+msgid "Next lesson"
+msgstr "Следующий урок"

@@ -19,6 +19,18 @@ export const iconClass = (icon?: string): string | undefined =>
 		? `lucide-${icon.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`
 		: undefined
 
+// The admin's sidebar pages carry their icon as data, and the lucide utility
+// classes are generated only for names that appear somewhere in the source —
+// a name first seen at runtime paints nothing. These are the icons
+// lms_frappe_app gives its pages (study in the browser, the documents, connect
+// an agent); listed here so their classes exist. The agent page lost its icon
+// on the phone for exactly this reason (learning-services#310).
+export const PLATFORM_PAGE_ICONS: readonly string[] = [
+	'lucide-message-circle',
+	'lucide-file-text',
+	'lucide-bot',
+]
+
 // The sections survive as a sort order, not as three headings: one "Pages"
 // list, course content first. Sorting rather than grouping keeps related rows
 // adjacent, which arrival order would not — the sidebar and the moderator
