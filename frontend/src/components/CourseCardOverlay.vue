@@ -9,8 +9,8 @@
 				{{ priceLabel }}
 			</div>
 			<div v-if="!readOnlyMode">
-				<div v-if="course.data?.membership" class="space-y-2 mb-8">
-					<!-- One click into the mentor session on the next open lesson; the
+				<div v-if="course.data?.membership" class="space-y-2">
+					<!-- One click into the agent session on the next open lesson; the
 					reader stays as the fallback for a site without lms_frappe_app. -->
 					<template v-if="entry">
 						<a
@@ -65,11 +65,7 @@
 						},
 					}"
 				>
-					<Button
-						variant="solid"
-						size="md"
-						class="w-full mb-8 text-p-base-medium"
-					>
+					<Button variant="solid" size="md" class="w-full text-p-base-medium">
 						<template #prefix>
 							<span class="lucide-credit-card size-4" />
 						</template>
@@ -82,7 +78,6 @@
 					v-else-if="course.data?.disable_self_learning && !isAdmin"
 					theme="blue"
 					size="lg"
-					class="mb-4"
 				>
 					{{ __('Contact the Administrator to enroll for this course') }}
 				</Badge>
@@ -90,7 +85,7 @@
 					v-else-if="!isAdmin"
 					@click="enrollStudent()"
 					variant="solid"
-					class="w-full mb-8"
+					class="w-full"
 					size="md"
 				>
 					<template #prefix>
@@ -113,53 +108,6 @@
 					{{ __('Get Certificate') }}
 				</Button>
 			</div>
-			<section v-if="hasCourseStats" class="space-y-3">
-				<div class="text-base text-ink-gray-9 mb-1">
-					{{ __('This course includes:') }}
-				</div>
-				<div
-					v-if="enrolledLabel"
-					class="flex items-center gap-3 text-ink-gray-8"
-				>
-					<span class="lucide-users size-4 shrink-0 text-ink-gray-7" />
-					<span>{{ plural(enrolledCount, ENROLLED, enrolledLabel) }}</span>
-				</div>
-				<div
-					v-if="course.data?.video_link"
-					class="flex items-center gap-3 text-ink-gray-8"
-				>
-					<span class="lucide-monitor-play size-4 shrink-0 text-ink-gray-7" />
-					<span>{{ __('On demand course video') }}</span>
-				</div>
-				<div
-					v-if="course.data?.lessons"
-					class="flex items-center gap-3 text-ink-gray-8"
-				>
-					<span class="lucide-book-open size-4 shrink-0 text-ink-gray-7" />
-					<span>{{ plural(course.data.lessons, LESSONS) }}</span>
-				</div>
-				<div
-					v-if="(course.data?.quiz_count || 0) > 0"
-					class="flex items-center gap-3 text-ink-gray-8"
-				>
-					<span class="lucide-help-circle size-4 shrink-0 text-ink-gray-7" />
-					<span>
-						{{ course.data?.quiz_count }}
-						{{
-							course.data?.quiz_count === 1
-								? __('Quiz topic')
-								: __('Quiz topics')
-						}}
-					</span>
-				</div>
-				<div
-					v-if="course.data?.enable_certification"
-					class="flex items-center gap-3 text-ink-gray-8"
-				>
-					<span class="lucide-award size-4 shrink-0 text-ink-gray-7" />
-					<span>{{ __('Certificate of completion') }}</span>
-				</div>
-			</section>
 		</div>
 	</div>
 </template>
@@ -172,7 +120,6 @@ import VideoPreview from '@/components/VideoPreview.vue'
 import { useTelemetry } from 'frappe-ui/frappe'
 import { openExternal } from '@/utils/openExternal'
 import { safeUrl } from '@/utils/safeUrl'
-import { ENROLLED, LESSONS, plural } from '@/utils/plural'
 import type {
 	CourseDetails,
 	CourseInstructorInfo,
@@ -230,8 +177,8 @@ const entry = computed<CourseEntry | null>(
 const studyLabel = computed<string>(() => {
 	if (entry.value?.study.channel === 'agent') return __('Connect your agent')
 	return entry.value?.completed
-		? __('Repeat with your mentor')
-		: __('Continue with your mentor')
+		? __('Repeat with the agent')
+		: __('Continue with the agent')
 })
 
 function enrollStudent() {
@@ -286,31 +233,6 @@ const priceLabel = computed<string>(() => {
 	if (props.course.data?.paid_course) return props.course.data?.price || ''
 	return __('Free')
 })
-
-// The number the label shows — rounded down to a tier past 50 — also picks the
-// noun's form: «50+ учеников», not the form of the exact count.
-const enrolledCount = computed<number>(() => {
-	const n = props.course.data?.enrollments ?? 0
-	if (n < 50) return n
-	const tier = n < 1000 ? 50 : 100
-	return Math.floor(n / tier) * tier
-})
-
-const enrolledLabel = computed<string>(() => {
-	const n = props.course.data?.enrollments ?? 0
-	if (!n) return ''
-	return n < 50 ? String(n) : `${enrolledCount.value}+`
-})
-
-const hasCourseStats = computed<boolean>(() =>
-	Boolean(
-		enrolledLabel.value ||
-			props.course.data?.video_link ||
-			props.course.data?.lessons ||
-			(props.course.data?.quiz_count ?? 0) > 0 ||
-			props.course.data?.enable_certification
-	)
-)
 
 const canGetCertificate = computed<boolean>(() => {
 	return Boolean(

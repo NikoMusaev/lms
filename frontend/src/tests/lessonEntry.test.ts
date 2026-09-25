@@ -46,7 +46,7 @@ describe('LessonEntry', () => {
 		expect(wrapper.get('[data-testid="lesson-study"]').attributes('href')).toBe(
 			'https://lms.example.com/chat?lesson=l-1'
 		)
-		expect(wrapper.text()).toContain('Study with your mentor')
+		expect(wrapper.text()).toContain('Study with the agent')
 		expect(wrapper.text()).toContain('trial lessons left: 2')
 		expect(wrapper.find('[data-testid="lesson-own-agent"]').exists()).toBe(true)
 	})
@@ -85,7 +85,7 @@ describe('LessonEntry', () => {
 		const wrapper = mountEntry(entry({ completed: true }))
 
 		expect(wrapper.find('[data-testid="lesson-completed"]').exists()).toBe(true)
-		expect(wrapper.text()).toContain('Repeat with your mentor')
+		expect(wrapper.text()).toContain('Repeat with the agent')
 	})
 
 	it('does not count trials for a lesson already started in the chat', () => {
@@ -99,7 +99,7 @@ describe('LessonEntry', () => {
 			})
 		)
 
-		expect(wrapper.text()).toContain('In the browser, with the platform mentor')
+		expect(wrapper.text()).toContain('In the browser, with the platform agent')
 		expect(wrapper.text()).not.toContain('trial lessons left')
 	})
 })

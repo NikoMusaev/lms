@@ -66,13 +66,6 @@ export const STUDENTS: PluralForms = {
 	other: '{0} students',
 }
 
-export const ENROLLED: PluralForms = {
-	one: '{0} student enrolled',
-	few: '{0} students enrolled [few]',
-	many: '{0} students enrolled [many]',
-	other: '{0} students enrolled',
-}
-
 export const LESSONS: PluralForms = {
 	one: '{0} lesson',
 	few: '{0} lessons [few]',

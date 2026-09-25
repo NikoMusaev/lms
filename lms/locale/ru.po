@@ -9894,20 +9894,20 @@ msgid "No objectives yet"
 msgstr "Цели пока не заданы"
 
 #: frontend/src/components/LessonEntry.vue
-msgid "This lesson is a conversation with a mentor"
-msgstr "Этот урок — разговор с наставником"
+msgid "This lesson is a conversation with an agent"
+msgstr "Этот урок — разговор с агентом"
 
 #: frontend/src/components/LessonEntry.vue
 msgid "Lesson completed"
 msgstr "Урок пройден"
 
 #: frontend/src/components/LessonEntry.vue
-msgid "Study with your mentor"
-msgstr "Заниматься с наставником"
+msgid "Study with the agent"
+msgstr "Заниматься с агентом"
 
 #: frontend/src/components/LessonEntry.vue
-msgid "Repeat with your mentor"
-msgstr "Повторить с наставником"
+msgid "Repeat with the agent"
+msgstr "Повторить с агентом"
 
 #: frontend/src/components/LessonEntry.vue
 msgid "Connect your agent"
@@ -9922,8 +9922,8 @@ msgid "In the browser, trial lessons left: {0}"
 msgstr "В браузере, пробных уроков осталось: {0}"
 
 #: frontend/src/components/LessonEntry.vue
-msgid "In the browser, with the platform mentor"
-msgstr "В браузере, с наставником платформы"
+msgid "In the browser, with the platform agent"
+msgstr "В браузере, с агентом платформы"
 
 #: frontend/src/components/LessonEntry.vue
 msgid "Have your own AI agent?"
@@ -9986,8 +9986,8 @@ msgid "Next lesson"
 msgstr "Следующий урок"
 
 #: frontend/src/components/CourseCardOverlay.vue
-msgid "Continue with your mentor"
-msgstr "Продолжить с наставником"
+msgid "Continue with the agent"
+msgstr "Продолжить с агентом"
 
 #: frontend/src/components/CourseCardOverlay.vue
 msgid "Next: {0}"
@@ -10062,8 +10062,8 @@ msgid "{0} more"
 msgstr "ещё {0}"
 
 #: frontend/src/components/CourseProgram/LessonSlide.vue
-msgid "Enroll to study"
-msgstr "Записаться и заниматься"
+msgid "Open lesson"
+msgstr "Открыть урок"
 
 #: frontend/src/components/CourseProgram/LessonSlide.vue
 msgid "covered"
@@ -10092,22 +10092,6 @@ msgstr "{0} учеников"
 #: frontend/src/utils/plural.ts
 msgid "{0} students"
 msgstr "{0} ученика"
-
-#: frontend/src/utils/plural.ts
-msgid "{0} student enrolled"
-msgstr "Записан {0} ученик"
-
-#: frontend/src/utils/plural.ts
-msgid "{0} students enrolled [few]"
-msgstr "Записаны {0} ученика"
-
-#: frontend/src/utils/plural.ts
-msgid "{0} students enrolled [many]"
-msgstr "Записано {0} учеников"
-
-#: frontend/src/utils/plural.ts
-msgid "{0} students enrolled"
-msgstr "Записано {0} ученика"
 
 #: frontend/src/utils/plural.ts
 msgid "{0} lesson"

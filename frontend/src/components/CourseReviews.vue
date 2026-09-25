@@ -1,7 +1,12 @@
 <template>
 	<div v-if="reviews.data?.length || membership" class="mt-12">
-		<div class="flex items-center justify-between gap-3 mb-8">
-			<div class="flex items-center gap-2">
+		<!-- No rating to show until someone rates: «0 course rating & 0 user
+		ratings» was noise (learning-services#326). The button stays. -->
+		<div
+			class="flex items-center justify-between gap-3"
+			:class="{ 'mb-8': visibleReviews.length }"
+		>
+			<div v-if="reviews.data?.length" class="flex items-center gap-2">
 				<LucideStar class="size-5 text-transparent fill-yellow-500" />
 				<span class="text-3xl-semibold text-ink-gray-9">
 					{{ avg_rating ? formatRating(avg_rating) : '0' }}

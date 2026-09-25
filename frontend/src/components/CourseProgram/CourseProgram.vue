@@ -39,8 +39,7 @@
 						:status="lessonStatus(lesson, program.next_lesson)"
 						:position="index + 1"
 						:total="lessons.length"
-						:study="studies[lesson.id]"
-						:fallbackUrl="lessonUrl(lesson)"
+						:lessonUrl="lessonUrl(lesson)"
 					/>
 				</div>
 			</div>
@@ -74,15 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	computed,
-	nextTick,
-	onBeforeUnmount,
-	onMounted,
-	reactive,
-	ref,
-	watch,
-} from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Button } from 'frappe-ui'
 import { useRouter } from 'vue-router'
 import { useScreenSize } from '@/utils/composables'
@@ -97,13 +88,12 @@ import {
 
 // The course program: a map of the lessons and a slider of lesson cards, in
 // place of the honeycomb and the outline (learning-services#322). Data comes
-// from lms_frappe_app's course_map; where to study a lesson, from lesson_entry,
-// asked only for the slide on screen.
+// from lms_frappe_app's course_map. Each slide links to its lesson page; the
+// course card holds the one button into study (learning-services#326).
 
 const props = defineProps<{
 	program: ProgramData
 	courseName: string
-	enrolled: boolean
 }>()
 
 const router = useRouter()
@@ -113,9 +103,6 @@ const lessons = computed(() => flattenLessons(props.program.chapters))
 const current = ref(startIndex(lessons.value, props.program.next_lesson))
 const scroller = ref<HTMLElement | null>(null)
 const slides: HTMLElement[] = []
-
-type Study = { channel: 'web' | 'agent'; url: string }
-const studies = reactive<Record<string, Study | null>>({})
 
 const reducedMotion = (): boolean =>
 	typeof window !== 'undefined' &&
@@ -139,8 +126,8 @@ function select(index: number): void {
 	scrollTo(index, true)
 }
 
-// The page is the fallback: it offers the way in, or a log-in or enrolment to
-// someone who cannot study yet.
+// The lesson page offers the way in, or a log-in or enrolment to someone who
+// cannot study yet.
 function lessonUrl(lesson: { chapterIndex: number; id: string }): string {
 	const chapter = props.program.chapters[lesson.chapterIndex]
 	const lessonNumber = chapter.lessons.findIndex((l) => l.id === lesson.id) + 1
@@ -153,32 +140,6 @@ function lessonUrl(lesson: { chapterIndex: number; id: string }): string {
 		},
 	}).href
 }
-
-// GET-only on the server, like the course map; asked once per lesson.
-async function loadStudy(lessonId: string): Promise<void> {
-	if (!props.enrolled || lessonId in studies) return
-	studies[lessonId] = null
-	try {
-		const response = await fetch(
-			`/api/method/lms_frappe_app.api.public.lesson_entry?lesson=${encodeURIComponent(
-				lessonId
-			)}`,
-			{ headers: { Accept: 'application/json' }, credentials: 'same-origin' }
-		)
-		const body = response.ok ? await response.json() : null
-		studies[lessonId] = body?.message?.data?.study ?? null
-	} catch {
-		studies[lessonId] = null
-	}
-}
-
-watch(
-	() => lessons.value[current.value]?.id,
-	(id) => {
-		if (id) loadStudy(id)
-	},
-	{ immediate: true }
-)
 
 let observer: IntersectionObserver | null = null
 let resizer: ResizeObserver | null = null
@@ -244,6 +205,23 @@ onBeforeUnmount(() => {
 	/* Room for the first and last slides to sit in the middle too. */
 	padding-inline: calc((100% - var(--slide-width)) / 2);
 	--slide-width: min(35rem, 85%);
+	--edge: calc((100% - var(--slide-width)) / 2);
+	/* The neighbours fade out towards the edges rather than end in cut-off
+	   words (learning-services#326): enough to show there is more, no more. */
+	-webkit-mask-image: linear-gradient(
+		90deg,
+		transparent,
+		#000 var(--edge),
+		#000 calc(100% - var(--edge)),
+		transparent
+	);
+	mask-image: linear-gradient(
+		90deg,
+		transparent,
+		#000 var(--edge),
+		#000 calc(100% - var(--edge)),
+		transparent
+	);
 }
 
 .slides::-webkit-scrollbar {
@@ -253,7 +231,7 @@ onBeforeUnmount(() => {
 .slide {
 	flex: 0 0 var(--slide-width);
 	scroll-snap-align: center;
-	opacity: 0.45;
+	opacity: 0.35;
 	transition: opacity 150ms ease;
 }
 

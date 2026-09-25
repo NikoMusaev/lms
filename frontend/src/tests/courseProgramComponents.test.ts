@@ -123,15 +123,17 @@ describe('ProgramMap', () => {
 		expect(dots[2].attributes('data-next')).toBe('')
 	})
 
-	it('groups the dots under the chapter titles', () => {
+	it('groups the dots by chapter without writing the titles out', () => {
+		// learning-services#326: the titles over the dots looked poor; the
+		// chapter is on the slide, and a hover still names the group.
 		const wrapper = mount(ProgramMap, {
 			props: { chapters: enrolled.chapters, nextLesson: 'l-3', current: 0 },
 			global,
 		})
-		expect(wrapper.findAll('[data-testid="map-chapter"]').map((c) => c.text())).toEqual([
-			'Рамка',
-			'Выявление',
-		])
+		const groups = wrapper.findAll('[data-testid="map-chapter"]')
+		expect(groups.map((g) => g.attributes('title'))).toEqual(['Рамка', 'Выявление'])
+		expect(groups.map((g) => g.findAll('button').length)).toEqual([1, 2])
+		expect(wrapper.text()).not.toContain('Рамка')
 	})
 
 	it('reports the slide a dot stands for', async () => {
@@ -162,7 +164,7 @@ describe('LessonSlide', () => {
 				status: 'in-progress',
 				position: 2,
 				total: 3,
-				fallbackUrl: '/lms/courses/course-1/learn/2-1',
+				lessonUrl: '/lms/courses/course-1/learn/2-1',
 				...props,
 			},
 			global,
@@ -178,26 +180,12 @@ describe('LessonSlide', () => {
 		])
 	})
 
-	it('goes to the lesson page until lesson_entry answers, then into the session', () => {
-		expect(slide({}).get('[data-testid="slide-action"]').attributes('href')).toBe(
-			'/lms/courses/course-1/learn/2-1'
-		)
-		const wrapper = slide({
-			study: { channel: 'web', url: 'https://lms.example.com/chat?lesson=l-2' },
-		})
-		expect(wrapper.get('[data-testid="slide-action"]').attributes('href')).toBe(
-			'https://lms.example.com/chat?lesson=l-2'
-		)
-		expect(wrapper.text()).toContain('Continue with your mentor')
-	})
-
-	it('sends to the own-agent page once trial lessons are used up', () => {
-		const wrapper = slide({ study: { channel: 'agent', url: '/agent' } })
-		expect(wrapper.text()).toContain('Connect your agent')
-	})
-
-	it('offers a completed lesson for repeating', () => {
-		expect(slide({ status: 'completed' }).text()).toContain('Repeat with your mentor')
+	it('links to the lesson page, not a second button into the session', () => {
+		// learning-services#326: the course card holds the one button.
+		const link = slide({}).get('[data-testid="slide-action"]')
+		expect(link.attributes('href')).toBe('/lms/courses/course-1/learn/2-1')
+		expect(link.text()).toBe('Open lesson')
+		expect(slide({}).find('button').exists()).toBe(false)
 	})
 
 	it('hides topics past six behind a count', async () => {
@@ -210,10 +198,13 @@ describe('LessonSlide', () => {
 		expect(wrapper.findAll('li')).toHaveLength(8)
 	})
 
-	it('gives a visitor no count and the way in instead of a session', () => {
+	it('gives a visitor no count, and the same way to the lesson', () => {
 		const wrapper = slide({ status: 'none' })
 		expect(wrapper.find('[data-testid="slide-count"]').exists()).toBe(false)
-		expect(wrapper.text()).toContain('Enroll to study')
+		expect(wrapper.find('[data-testid="slide-status"]').exists()).toBe(false)
+		expect(wrapper.get('[data-testid="slide-action"]').attributes('href')).toBe(
+			'/lms/courses/course-1/learn/2-1'
+		)
 	})
 })
 
@@ -222,54 +213,46 @@ describe('CourseProgram', () => {
 
 	beforeEach(() => {
 		fetchMock.mockReset()
-		fetchMock.mockResolvedValue({
-			ok: true,
-			json: () =>
-				Promise.resolve({
-					message: { data: { study: { channel: 'web', url: '/chat?lesson=l-3' } } },
-				}),
-		})
 		vi.stubGlobal('fetch', fetchMock)
 	})
 
-	it('opens on the next lesson and asks where to study it', async () => {
+	it('opens on the next lesson and links each slide to its page', async () => {
 		const wrapper = mount(CourseProgram, {
-			props: { program: enrolled, courseName: 'course-1', enrolled: true },
+			props: { program: enrolled, courseName: 'course-1' },
 			global,
 		})
 		await flushPromises()
 
 		expect(wrapper.get('[aria-current="step"]').attributes('aria-label')).toContain('Lesson 3')
-		expect(fetchMock).toHaveBeenCalledTimes(1)
-		expect(String(fetchMock.mock.calls[0][0])).toContain('lesson_entry?lesson=l-3')
 		expect(wrapper.get('.slide.is-current [data-testid="slide-action"]').attributes('href')).toBe(
-			'/chat?lesson=l-3'
+			'/lms/courses/course-1/learn/2-2'
 		)
+		// Where to study is the course card's question now: no request per slide.
+		expect(fetchMock).not.toHaveBeenCalled()
 	})
 
-	it('moves to the lesson picked on the map, and asks only once per lesson', async () => {
+	it('moves to the lesson picked on the map', async () => {
 		const wrapper = mount(CourseProgram, {
-			props: { program: enrolled, courseName: 'course-1', enrolled: true },
+			props: { program: enrolled, courseName: 'course-1' },
 			global,
 		})
 		await flushPromises()
 		await wrapper.findAll('nav button')[0].trigger('click')
 		await flushPromises()
-		await wrapper.findAll('nav button')[2].trigger('click')
-		await flushPromises()
 
-		expect(wrapper.get('.slide.is-current').attributes('data-index')).toBe('2')
-		expect(fetchMock).toHaveBeenCalledTimes(2)
+		expect(wrapper.get('.slide.is-current').attributes('data-index')).toBe('0')
+		expect(wrapper.get('.slide.is-current [data-testid="slide-action"]').attributes('href')).toBe(
+			'/lms/courses/course-1/learn/1-1'
+		)
 	})
 
-	it('asks nothing for a visitor and points at the lesson page', async () => {
+	it('points a visitor at the lesson page too', async () => {
 		const wrapper = mount(CourseProgram, {
-			props: { program: guest, courseName: 'course-1', enrolled: false },
+			props: { program: guest, courseName: 'course-1' },
 			global,
 		})
 		await flushPromises()
 
-		expect(fetchMock).not.toHaveBeenCalled()
 		expect(wrapper.get('.slide.is-current [data-testid="slide-action"]').attributes('href')).toBe(
 			'/lms/courses/course-1/learn/1-1'
 		)
