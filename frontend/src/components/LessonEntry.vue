@@ -1,0 +1,97 @@
+<template>
+	<div class="px-5 pt-8 sm:pt-5 pb-10">
+		<div class="max-w-xl">
+			<div class="text-p-sm text-ink-gray-5">
+				{{ __('This lesson is a conversation with a mentor') }}
+			</div>
+			<h1 class="mt-1 text-4xl-semibold text-ink-gray-9">
+				{{ title }}
+			</h1>
+			<div
+				v-if="entry.completed"
+				data-testid="lesson-completed"
+				class="mt-3 inline-flex items-center gap-1.5 text-p-sm-medium text-ink-green-3"
+			>
+				<span class="lucide-circle-check size-4" aria-hidden="true" />
+				{{ __('Lesson completed') }}
+			</div>
+			<p
+				v-if="entry.hook"
+				data-testid="lesson-hook"
+				class="mt-5 text-p-base text-ink-gray-8 whitespace-pre-line"
+			>
+				{{ entry.hook }}
+			</p>
+
+			<div class="mt-8 flex flex-col items-start gap-2">
+				<a :href="safeUrl(entry.study.url)" data-testid="lesson-study">
+					<Button variant="solid" size="md">
+						{{ primaryLabel }}
+					</Button>
+				</a>
+				<div class="text-p-sm text-ink-gray-6">
+					{{ primaryHint }}
+				</div>
+			</div>
+
+			<div v-if="inWebChat" class="mt-6 text-p-sm text-ink-gray-6">
+				{{ __('Have your own AI agent?') }}
+				<a
+					href="/agent"
+					data-testid="lesson-own-agent"
+					class="text-ink-gray-8 underline"
+					>{{ __('Connect it') }}</a
+				>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { Button } from 'frappe-ui'
+import { safeUrl } from '@/utils/safeUrl'
+
+// What lms_frappe_app.api.public.lesson_entry answers. A lesson on this
+// platform is taught by a mentor, so the page shows the way into that lesson
+// instead of the material: the material is written for the mentor, not for
+// reading alone.
+export interface LessonEntryData {
+	title: string
+	hook: string | null
+	completed: boolean
+	study: {
+		// `web` — the platform's web chat on this lesson; `agent` — the page
+		// that explains how to connect one's own agent.
+		channel: 'web' | 'agent'
+		url: string
+		demo_left: number
+	}
+}
+
+const props = defineProps<{
+	entry: LessonEntryData
+	title: string
+}>()
+
+const inWebChat = computed(() => props.entry.study.channel === 'web')
+
+const primaryLabel = computed(() => {
+	if (!inWebChat.value) return __('Connect your agent')
+	return props.entry.completed
+		? __('Repeat with your mentor')
+		: __('Study with your mentor')
+})
+
+const primaryHint = computed(() => {
+	if (!inWebChat.value)
+		return __(
+			'Trial lessons in the browser are used up. Lessons continue with your own agent, and your progress is kept.'
+		)
+	if (props.entry.study.demo_left > 0)
+		return __('In the browser, trial lessons left: {0}').format(
+			props.entry.study.demo_left
+		)
+	return __('In the browser, with the platform mentor')
+})
+</script>

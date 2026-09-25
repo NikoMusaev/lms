@@ -104,7 +104,16 @@
 					'overflow-y-auto': zenModeEnabled,
 				}"
 			>
+				<div v-if="entryState === 'entry'" class="sm:border-e h-full">
+					<LessonEntry
+						:entry="lessonEntry.data.data"
+						:title="lesson.data.title"
+					/>
+				</div>
+				<!-- v-show, not v-if: EditorJS renders into #editor by id, and the
+				holder has to exist whichever way the entry resolves. -->
 				<div
+					v-show="entryState === 'content'"
 					class="sm:border-e pt-8 sm:pt-5 pb-10 h-full"
 					:class="{
 						'w-full md:w-3/5 mx-auto border-none !pt-10': zenModeEnabled,
@@ -435,6 +444,7 @@ import Discussions from '@/components/Discussions.vue'
 import CertificationLinks from '@/components/CertificationLinks.vue'
 import CourseOutline from '@/components/CourseOutline.vue'
 import LockedLessonNotice from '@/components/LockedLessonNotice.vue'
+import LessonEntry from '@/components/LessonEntry.vue'
 import StudentLessonSidebar from '@/components/StudentLessonSidebar.vue'
 import BottomSheet from '@/components/BottomSheet.vue'
 import PageHeader from '@/components/Layouts/PageHeader.vue'
@@ -556,6 +566,60 @@ const lesson = createResource({
 	auto: true,
 })
 
+// A lesson on this platform is taught by a mentor — in the platform's web chat
+// or through the student's own agent — so a student opening it here is shown
+// the way into that session instead of the material, which is written for the
+// mentor. The answer comes from lms_frappe_app (learning-services#309).
+//
+// `content` is the fallback for everything else: an editor reviewing the
+// lesson, a visitor on a preview lesson, and a site without the app, which
+// answers AppNotInstalledError. While the entry is on its way the page shows
+// neither, so the material does not flash before the entry replaces it.
+const entryState = ref('content')
+
+const lessonEntry = createResource({
+	url: 'lms_frappe_app.api.public.lesson_entry',
+	// GET-only on the server, like the course map; the default POST gets 403.
+	method: 'GET',
+	makeParams() {
+		return { lesson: lesson.data?.name }
+	},
+	auto: false,
+})
+
+// The student view shows an editor what the student sees, so it asks for the
+// entry too; `canEditLesson` reads the real user and stays true in it.
+const wantsEntry = (data) =>
+	Boolean(
+		data?.name &&
+			!data.locked &&
+			!data.no_preview &&
+			(isStudentView.value || !canEditLesson.value) &&
+			(data.membership || isStudentView.value)
+	)
+
+watch(
+	() => lesson.data,
+	(data) => {
+		if (!wantsEntry(data)) {
+			entryState.value = 'content'
+			return
+		}
+		entryState.value = 'loading'
+		// Wrapped: a fetch that hands back no promise must still settle the page
+		// on the material rather than leave it blank.
+		Promise.resolve(lessonEntry.fetch())
+			.then((answer) => {
+				// Same lesson still on screen? A quick next/prev can outrun the call.
+				if (lesson.data?.name !== data.name) return
+				entryState.value = answer?.data ? 'entry' : 'content'
+			})
+			.catch(() => {
+				if (lesson.data?.name === data.name) entryState.value = 'content'
+			})
+	}
+)
+
 // The stored body would not parse, so there is nothing to render and nothing
 // the student can do about it. Say so rather than show a lesson with no body.
 const contentUnreadable = ref(false)
@@ -654,11 +718,15 @@ const markProgress = () => {
 	// membership row so save_progress would no-op server-side but still
 	// flip the in-memory `completedLesson` and show a green tick that
 	// vanishes on refresh.
+	// A lesson shown as the way into a mentor session is not being read, and
+	// the server refuses to close it on a timer anyway (lms_frappe_app,
+	// learning-services#305); asking would only log a refusal per visit.
 	if (
 		!user.data ||
 		!lesson.data ||
 		!lesson.data.membership ||
-		lesson.data.progress
+		lesson.data.progress ||
+		entryState.value !== 'content'
 	)
 		return
 	progressSubmitting = true
