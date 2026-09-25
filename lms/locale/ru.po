@@ -9996,3 +9996,83 @@ msgstr "Дальше: {0}"
 #: frontend/src/pages/Courses/CourseDetail.vue
 msgid "Course reports"
 msgstr "Репорты о курсе"
+
+#: frontend/src/pages/Courses/CourseOverview.vue
+msgid "Course program"
+msgstr "Программа курса"
+
+#: frontend/src/components/CourseProgram/ProgramMap.vue
+msgid "Lessons of the course"
+msgstr "Уроки курса"
+
+#: frontend/src/components/CourseProgram/CourseProgram.vue
+msgid "carousel"
+msgstr "карусель"
+
+#: frontend/src/components/CourseProgram/ProgramMap.vue
+msgid "passed"
+msgstr "пройден"
+
+#: frontend/src/components/CourseProgram/ProgramMap.vue
+msgid "in progress"
+msgstr "идёт"
+
+#: frontend/src/components/CourseProgram/ProgramMap.vue
+msgid "up next"
+msgstr "следующий"
+
+#: frontend/src/components/CourseProgram/ProgramMap.vue
+msgid "ahead"
+msgstr "впереди"
+
+#: frontend/src/components/CourseProgram/ProgramMap.vue
+msgid "{0} of {1} topics"
+msgstr "{0} из {1} тем"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "Lesson {0} of {1}"
+msgstr "Урок {0} из {1}"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "lesson {0} of {1}"
+msgstr "урок {0} из {1}"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "Lesson passed"
+msgstr "Пройден"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "In progress"
+msgstr "Идёт"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "Up next"
+msgstr "Следующий"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "Topics"
+msgstr "Темы"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "{0} of {1} covered"
+msgstr "{0} из {1} разобрано"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "{0} more"
+msgstr "ещё {0}"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "Enroll to study"
+msgstr "Записаться и заниматься"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "covered"
+msgstr "разобрано"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "touched in passing"
+msgstr "задето вскользь"
+
+#: frontend/src/components/CourseProgram/LessonSlide.vue
+msgid "not yet"
+msgstr "не дошли"

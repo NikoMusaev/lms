@@ -4,7 +4,7 @@
 		<div
 			class="flex flex-col md:flex-row items-start justify-between w-full gap-x-8 gap-y-8"
 		>
-			<div class="md:w-2/3 space-y-10 min-w-0">
+			<div class="w-full md:w-2/3 space-y-10 min-w-0">
 				<section class="space-y-4">
 					<h1 class="text-4xl-semibold text-ink-gray-9">
 						{{ course.data.title }}
@@ -87,16 +87,21 @@
 					</div>
 				</section>
 
-				<section v-if="hasCourseMap">
+				<!-- The program replaces both the old honeycomb map and the outline:
+				the same lessons, once, with each one's status and topics
+				(learning-services#322). Without lms_frappe_app the outline stays. -->
+				<section v-if="program" data-testid="course-program-section">
 					<h2 class="text-3xl-semibold text-ink-gray-9 mb-4">
-						{{ __('Course map') }}
+						{{ __('Course program') }}
 					</h2>
-					<div class="border rounded-md p-4">
-						<CourseMap :chapters="courseMap.data.data.chapters" />
-					</div>
+					<CourseProgram
+						:program="program"
+						:courseName="course.data.name"
+						:enrolled="Boolean(course.data.membership)"
+					/>
 				</section>
 
-				<section>
+				<section v-else>
 					<div class="flex items-baseline justify-between gap-4 mb-4">
 						<h2 class="text-3xl-semibold text-ink-gray-9">
 							{{ __('Course content') }}
@@ -169,13 +174,14 @@ import type {
 } from '@/types'
 import CourseCardOverlay from '@/components/CourseCardOverlay.vue'
 import CourseOutline from '@/components/CourseOutline.vue'
-import CourseMap from '@/components/CourseMap.vue'
+import CourseProgram from '@/components/CourseProgram/CourseProgram.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import CourseReviews from '@/components/CourseReviews.vue'
 import CourseInstructors from '@/components/CourseInstructors.vue'
 import CourseCreatorCard from '@/components/CourseCreatorCard.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import RelatedCourses from '@/components/RelatedCourses.vue'
+import type { ProgramData } from '@/utils/courseProgram'
 
 const props = defineProps<{
 	course: Resource<CourseDetails | null>
@@ -222,7 +228,7 @@ const courseMap = createResource({
 		return { course: props.course.data?.name }
 	},
 	auto: false,
-}) as Resource<{ data: { chapters: unknown[] } } | null>
+}) as Resource<{ data: ProgramData } | null>
 
 watch(
 	() => props.course.data?.name,
@@ -237,12 +243,12 @@ watch(
 	{ immediate: true }
 )
 
-// A course with no directives has no objectives to show, and an empty
-// honeycomb next to a full outline reads as a broken page rather than an empty
-// one. The map appears only when there is something in it.
-const hasCourseMap = computed<boolean>(() =>
-	Boolean(courseMap.data?.data?.chapters?.length)
-)
+// The program needs lessons, not objectives: a lesson without them still gets
+// its slide, just without the topics. No lessons — the outline's own empty state.
+const program = computed<ProgramData | null>(() => {
+	const data = courseMap.data?.data
+	return data?.chapters?.some((chapter) => chapter.lessons.length) ? data : null
+})
 
 const outlineStats = computed(() => {
 	const chapters = outline.data || []
