@@ -122,7 +122,7 @@
 					class="flex items-center gap-3 text-ink-gray-8"
 				>
 					<span class="lucide-users size-4 shrink-0 text-ink-gray-7" />
-					<span>{{ enrolledLabel }} {{ __('enrolled') }}</span>
+					<span>{{ plural(enrolledCount, ENROLLED, enrolledLabel) }}</span>
 				</div>
 				<div
 					v-if="course.data?.video_link"
@@ -136,10 +136,7 @@
 					class="flex items-center gap-3 text-ink-gray-8"
 				>
 					<span class="lucide-book-open size-4 shrink-0 text-ink-gray-7" />
-					<span>
-						{{ course.data?.lessons }}
-						{{ course.data?.lessons === 1 ? __('Lesson') : __('Lessons') }}
-					</span>
+					<span>{{ plural(course.data.lessons, LESSONS) }}</span>
 				</div>
 				<div
 					v-if="(course.data?.quiz_count || 0) > 0"
@@ -175,6 +172,7 @@ import VideoPreview from '@/components/VideoPreview.vue'
 import { useTelemetry } from 'frappe-ui/frappe'
 import { openExternal } from '@/utils/openExternal'
 import { safeUrl } from '@/utils/safeUrl'
+import { ENROLLED, LESSONS, plural } from '@/utils/plural'
 import type {
 	CourseDetails,
 	CourseInstructorInfo,
@@ -289,12 +287,19 @@ const priceLabel = computed<string>(() => {
 	return __('Free')
 })
 
+// The number the label shows — rounded down to a tier past 50 — also picks the
+// noun's form: «50+ учеников», not the form of the exact count.
+const enrolledCount = computed<number>(() => {
+	const n = props.course.data?.enrollments ?? 0
+	if (n < 50) return n
+	const tier = n < 1000 ? 50 : 100
+	return Math.floor(n / tier) * tier
+})
+
 const enrolledLabel = computed<string>(() => {
 	const n = props.course.data?.enrollments ?? 0
 	if (!n) return ''
-	if (n < 50) return String(n)
-	const tier = n < 1000 ? 50 : 100
-	return `${Math.floor(n / tier) * tier}+`
+	return n < 50 ? String(n) : `${enrolledCount.value}+`
 })
 
 const hasCourseStats = computed<boolean>(() =>

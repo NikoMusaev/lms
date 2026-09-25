@@ -40,10 +40,13 @@
 						<template v-if="course.data.enrollments">
 							<div class="flex items-center gap-1.5">
 								<span class="lucide-users-round size-4" />
-								<span
-									>{{ formatAmount(course.data.enrollments) }}
-									{{ __('Students') }}</span
-								>
+								<span>{{
+									plural(
+										course.data.enrollments,
+										STUDENTS,
+										formatAmount(course.data.enrollments)
+									)
+								}}</span>
 							</div>
 							<span class="lucide-dot size-5 text-ink-gray-7" />
 						</template>
@@ -182,6 +185,7 @@ import CourseCreatorCard from '@/components/CourseCreatorCard.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import RelatedCourses from '@/components/RelatedCourses.vue'
 import type { ProgramData } from '@/utils/courseProgram'
+import { LESSONS, SECTIONS, STUDENTS, plural } from '@/utils/plural'
 
 const props = defineProps<{
 	course: Resource<CourseDetails | null>
@@ -258,16 +262,10 @@ const outlineStats = computed(() => {
 	)
 	const parts: string[] = []
 	if (chapters.length) {
-		parts.push(
-			`${chapters.length} ${
-				chapters.length === 1 ? __('section') : __('sections')
-			}`
-		)
+		parts.push(plural(chapters.length, SECTIONS))
 	}
 	if (lessonCount) {
-		parts.push(
-			`${lessonCount} ${lessonCount === 1 ? __('lesson') : __('lessons')}`
-		)
+		parts.push(plural(lessonCount, LESSONS))
 	}
 	return parts.join(' · ')
 })

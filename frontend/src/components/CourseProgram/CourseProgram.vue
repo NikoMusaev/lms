@@ -18,7 +18,12 @@
 			@keydown.left.prevent="select(current - 1)"
 			@keydown.right.prevent="select(current + 1)"
 		>
-			<div ref="scroller" class="slides" data-testid="program-slides">
+			<div
+				ref="scroller"
+				class="slides"
+				data-testid="program-slides"
+				:style="height ? { height: `${height}px` } : undefined"
+			>
 				<div
 					v-for="(lesson, index) in lessons"
 					:key="lesson.id"
@@ -176,10 +181,33 @@ watch(
 )
 
 let observer: IntersectionObserver | null = null
+let resizer: ResizeObserver | null = null
+
+// As tall as the card on screen, not the longest lesson: a short lesson
+// otherwise sat above an empty band as tall as the difference
+// (learning-services#325). Taller neighbours are cut off at the bottom — they
+// are only edges anyway.
+const height = ref<number | null>(null)
+
+function measure(): void {
+	const card = slides[current.value]?.firstElementChild as HTMLElement | null
+	if (card?.offsetHeight) height.value = card.offsetHeight
+}
+
+watch(current, () => nextTick(measure))
 
 onMounted(async () => {
 	await nextTick()
 	scrollTo(current.value, false)
+	measure()
+	if (typeof ResizeObserver !== 'undefined') {
+		// A card grows when its topics unfold, and every card reflows with the page.
+		resizer = new ResizeObserver(() => measure())
+		slides.forEach((slide) => {
+			const card = slide?.firstElementChild
+			if (card) resizer?.observe(card)
+		})
+	}
 	if (typeof IntersectionObserver === 'undefined' || !scroller.value) return
 	// A swipe moves the slides without telling us; the slide that settles in the
 	// middle becomes the current one.
@@ -195,7 +223,10 @@ onMounted(async () => {
 	slides.forEach((slide) => slide && observer?.observe(slide))
 })
 
-onBeforeUnmount(() => observer?.disconnect())
+onBeforeUnmount(() => {
+	observer?.disconnect()
+	resizer?.disconnect()
+})
 </script>
 
 <style scoped>
@@ -206,7 +237,9 @@ onBeforeUnmount(() => observer?.disconnect())
 	align-items: flex-start;
 	gap: 1rem;
 	overflow-x: auto;
+	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
+	transition: height 200ms ease;
 	scrollbar-width: none;
 	/* Room for the first and last slides to sit in the middle too. */
 	padding-inline: calc((100% - var(--slide-width)) / 2);
@@ -246,7 +279,8 @@ onBeforeUnmount(() => observer?.disconnect())
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.slide {
+	.slide,
+	.slides {
 		transition: none;
 	}
 }
