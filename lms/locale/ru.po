@@ -9984,3 +9984,15 @@ msgstr "Предыдущий урок"
 #: frontend/src/pages/Lesson.vue
 msgid "Next lesson"
 msgstr "Следующий урок"
+
+#: frontend/src/components/CourseCardOverlay.vue
+msgid "Continue with your mentor"
+msgstr "Продолжить с наставником"
+
+#: frontend/src/components/CourseCardOverlay.vue
+msgid "Next: {0}"
+msgstr "Дальше: {0}"
+
+#: frontend/src/pages/Courses/CourseDetail.vue
+msgid "Course reports"
+msgstr "Репорты о курсе"

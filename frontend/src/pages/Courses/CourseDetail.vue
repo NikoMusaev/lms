@@ -108,6 +108,25 @@
 					{{ __('Author view') }}
 				</Button>
 			</a>
+			<!-- The reports students filed about this course live in the desk
+			(learning-services#301). -->
+			<a
+				v-if="tab?.key === 'overview' && course.data && !isMobile"
+				:href="
+					safeUrl(
+						`/desk/agent-course-report?course=${encodeURIComponent(
+							props.courseName
+						)}`
+					)
+				"
+			>
+				<Button variant="outline">
+					<template #prefix>
+						<span class="lucide-message-square-warning size-4" />
+					</template>
+					{{ __('Course reports') }}
+				</Button>
+			</a>
 			<!-- Enrol and publish sit on the overview too: it is the tab a course
 			opens on, and an admin looked for them there first
 			(learning-services#310). -->

@@ -44,6 +44,14 @@ export const GUEST_TABS: readonly NavLink[] = [
 	},
 	// No Statistics: site-wide counts are an admin's view, and a guest's bar is
 	// better spent on the way in (learning-services#310).
+	// The You page, which for a visitor lists the platform's own pages — how to
+	// study, how to connect an agent — above the way in (learning-services#301).
+	{
+		label: 'More',
+		icon: 'Ellipsis',
+		to: 'MobileYou',
+		activeFor: ['MobileYou'],
+	},
 	// No route: it leaves the SPA, so MobileLayout sends this one to Frappe's
 	// server-rendered /login rather than through vue-router.
 	{ label: 'Log in', icon: 'LogIn' },
