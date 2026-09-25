@@ -1,18 +1,26 @@
 <template>
 	<MobilePageLayout :title="__('You')" :show-header="false" grouped>
-		<div
-			v-if="!isSignedIn"
-			class="flex flex-col items-start gap-3 pt-4"
-			data-testid="you-signed-out"
-		>
-			<p class="text-p-base text-ink-gray-6">{{ signedOutPrompt }}</p>
-			<a
-				href="/login"
-				class="text-p-base font-medium text-ink-gray-9 underline underline-offset-2"
+		<template v-if="!isSignedIn">
+			<!-- The platform's own pages first: how to study and how to connect an
+			agent is what a visitor needs before an account (learning-services#301). -->
+			<SettingsRowList
+				v-if="guestPages.length"
+				:groups="guestPages"
+				@action="activate"
+			/>
+			<div
+				class="flex flex-col items-start gap-3 pt-4"
+				data-testid="you-signed-out"
 			>
-				{{ logInLabel }}
-			</a>
-		</div>
+				<p class="text-p-base text-ink-gray-6">{{ signedOutPrompt }}</p>
+				<a
+					href="/login"
+					class="text-p-base font-medium text-ink-gray-9 underline underline-offset-2"
+				>
+					{{ logInLabel }}
+				</a>
+			</div>
+		</template>
 
 		<template v-else>
 			<div
@@ -176,6 +184,11 @@ const groups = computed(() =>
 		unreadCount: unreadCount.value,
 		hasRoute: (name: string) => router.hasRoute(name),
 	})
+)
+
+// A visitor gets the Pages group alone: the session rows are an account's.
+const guestPages = computed(() =>
+	groups.value.filter((group) => group.key === 'Pages')
 )
 
 // Asked for here, not only by MobileLayout, so a cold deep link with no bar

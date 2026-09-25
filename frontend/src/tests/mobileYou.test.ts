@@ -222,6 +222,20 @@ describe('a signed-out visitor who types the URL', () => {
 		expect(wrapper.find('[data-testid="you-signed-out"]').exists()).toBe(true)
 		expect(wrapper.text()).not.toContain('Log out')
 	})
+
+	// learning-services#301: how to study and how to connect an agent come
+	// before an account.
+	it('sees the platform pages above the way in, and no account rows', async () => {
+		isLoggedIn.value = false
+		userResource.data = null
+		otherLinks.value = [
+			{ label: 'Подключить агента', icon: 'Bot', to: 'agent-sidebar' },
+			{ label: 'Log in', icon: 'LogIn', to: '' },
+		]
+		const { wrapper } = await openYou()
+		expect(wrapper.text()).toContain('Подключить агента')
+		expect(wrapper.text()).not.toContain('Colour mode')
+	})
 })
 
 describe('picking a row', () => {

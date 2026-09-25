@@ -10,7 +10,27 @@
 			</div>
 			<div v-if="!readOnlyMode">
 				<div v-if="course.data?.membership" class="space-y-2 mb-8">
+					<!-- One click into the mentor session on the next open lesson; the
+					reader stays as the fallback for a site without lms_frappe_app. -->
+					<template v-if="entry">
+						<a
+							:href="safeUrl(entry.study.url)"
+							data-testid="course-study"
+							class="block"
+						>
+							<Button variant="solid" size="md" class="w-full">
+								<template #prefix>
+									<span class="lucide-message-circle size-4" />
+								</template>
+								<span>{{ studyLabel }}</span>
+							</Button>
+						</a>
+						<div class="text-p-sm text-ink-gray-6">
+							{{ __('Next: {0}').format(entry.title) }}
+						</div>
+					</template>
 					<router-link
+						v-else
 						:to="{
 							name: 'Lesson',
 							params: {
@@ -147,13 +167,14 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed, inject, watch } from 'vue'
 import { Badge, Button, call, createResource, toast } from 'frappe-ui'
 import { useRouter } from 'vue-router'
 import CertificationLinks from '@/components/CertificationLinks.vue'
 import VideoPreview from '@/components/VideoPreview.vue'
 import { useTelemetry } from 'frappe-ui/frappe'
 import { openExternal } from '@/utils/openExternal'
+import { safeUrl } from '@/utils/safeUrl'
 import type {
 	CourseDetails,
 	CourseInstructorInfo,
@@ -173,6 +194,47 @@ const props = withDefaults(
 	}>(),
 	{}
 )
+
+// The next open lesson and where to study it, from lms_frappe_app
+// (learning-services#301). Learning's own `current_lesson` moves only with the
+// dwell timer, which this platform switched off (learning-services#305), so it
+// would always point at the first lesson.
+interface CourseEntry {
+	title: string
+	completed: boolean
+	study: { channel: 'web' | 'agent'; url: string }
+}
+
+const courseEntry = createResource({
+	url: 'lms_frappe_app.api.public.lesson_entry',
+	// GET-only on the server, like the course map; the default POST gets 403.
+	method: 'GET',
+	makeParams() {
+		return { course: props.course.data?.name }
+	},
+	auto: false,
+})
+
+watch(
+	() => [props.course.data?.name, Boolean(props.course.data?.membership)],
+	([name, enrolled]) => {
+		// Rejections handled: a site without lms_frappe_app answers
+		// AppNotInstalledError, and the reader link stays.
+		if (name && enrolled) Promise.resolve(courseEntry.fetch()).catch(() => {})
+	},
+	{ immediate: true }
+)
+
+const entry = computed<CourseEntry | null>(
+	() => (courseEntry.data as { data?: CourseEntry } | null)?.data ?? null
+)
+
+const studyLabel = computed<string>(() => {
+	if (entry.value?.study.channel === 'agent') return __('Connect your agent')
+	return entry.value?.completed
+		? __('Repeat with your mentor')
+		: __('Continue with your mentor')
+})
 
 function enrollStudent() {
 	if (!user.data) {
