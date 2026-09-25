@@ -150,7 +150,9 @@
 				:isSidebarCollapsed="sidebarStore.isSidebarCollapsed"
 			/>
 			<GettingStartedBanner
-				v-if="showOnboarding && !isOnboardingStepsCompleted"
+				v-if="
+					offerGettingStarted && showOnboarding && !isOnboardingStepsCompleted
+				"
 				:isSidebarCollapsed="sidebarStore.isSidebarCollapsed"
 				appName="learning"
 			/>
@@ -190,7 +192,10 @@
 							@click="redirectToAppointmentScreen()"
 						/>
 					</Tooltip>
-					<Tooltip v-if="showOnboarding" :text="__('Help')">
+					<Tooltip
+						v-if="offerGettingStarted && showOnboarding"
+						:text="__('Help')"
+					>
 						<span
 							class="lucide-circle-help size-4 text-ink-gray-7 cursor-pointer"
 							@click="
@@ -228,7 +233,7 @@
 		</div>
 		<HelpModal
 			data-testid="onboarding-help-modal"
-			v-if="showOnboarding && showHelpModal"
+			v-if="offerGettingStarted && showOnboarding && showHelpModal"
 			v-model="showHelpModal"
 			v-model:articles="articles"
 			appName="learning"
@@ -323,6 +328,13 @@ const {
 } = useSettings()
 const settingsStore = useSettings()
 const showOnboarding = ref(false)
+// The getting-started banner, panel and help button stay hidden. Frappe
+// Learning's steps walk through batches and a hand-built first course; here
+// courses are assembled by the curator's agent and batches are switched off,
+// so the panel covered a third of every page with steps that do not apply
+// (learning-services#310). Onboarding itself is still set up: the course,
+// lesson and member forms report their steps to it and throw without it.
+const offerGettingStarted = false
 const showIntermediateModal = ref(false)
 const currentStep = ref({})
 const router = useRouter()
@@ -634,10 +646,12 @@ const articles = ref([
 ])
 
 const setUpOnboarding = () => {
-	// Deliberately empty. Frappe Learning's getting-started walks through
-	// batches and a hand-built first course; here courses are assembled by the
-	// curator's agent and batches are switched off, so the panel covered a third
-	// of every page with steps that do not apply (learning-services#310).
+	if (userResource.data?.is_system_manager) {
+		onboardingDetails = useOnboarding('learning')
+		onboardingDetails.setUp(steps)
+		isOnboardingStepsCompleted = onboardingDetails.isOnboardingStepsCompleted
+		showOnboarding.value = true
+	}
 }
 
 watch(userResource, async () => {
