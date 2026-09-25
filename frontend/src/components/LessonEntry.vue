@@ -2,7 +2,7 @@
 	<div class="px-5 pt-8 sm:pt-5 pb-10">
 		<div class="max-w-xl">
 			<div class="text-p-sm text-ink-gray-5">
-				{{ __('This lesson is a conversation with a mentor') }}
+				{{ __('This lesson is a conversation with an agent') }}
 			</div>
 			<h1 class="mt-1 text-4xl-semibold text-ink-gray-9">
 				{{ title }}
@@ -53,8 +53,8 @@ import { Button } from 'frappe-ui'
 import { safeUrl } from '@/utils/safeUrl'
 
 // What lms_frappe_app.api.public.lesson_entry answers. A lesson on this
-// platform is taught by a mentor, so the page shows the way into that lesson
-// instead of the material: the material is written for the mentor, not for
+// platform is taught by an agent, so the page shows the way into that lesson
+// instead of the material: the material is written for the agent, not for
 // reading alone.
 export interface LessonEntryData {
 	title: string
@@ -79,8 +79,8 @@ const inWebChat = computed(() => props.entry.study.channel === 'web')
 const primaryLabel = computed(() => {
 	if (!inWebChat.value) return __('Connect your agent')
 	return props.entry.completed
-		? __('Repeat with your mentor')
-		: __('Study with your mentor')
+		? __('Repeat with the agent')
+		: __('Study with the agent')
 })
 
 const primaryHint = computed(() => {
@@ -92,6 +92,6 @@ const primaryHint = computed(() => {
 		return __('In the browser, trial lessons left: {0}').format(
 			props.entry.study.demo_left
 		)
-	return __('In the browser, with the platform mentor')
+	return __('In the browser, with the platform agent')
 })
 </script>

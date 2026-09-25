@@ -1,61 +1,57 @@
 <template>
 	<nav class="program-map" :aria-label="__('Lessons of the course')">
+		<!-- A chapter is a group of dots and a gap, not a heading: its title is on
+		the slide (learning-services#326). -->
 		<div
 			v-for="chapter in chapters"
 			:key="chapter.index"
-			class="flex min-w-0 flex-col gap-1"
+			class="flex items-center"
+			:title="chapter.title"
+			data-testid="map-chapter"
 		>
-			<span
-				class="truncate text-p-xs text-ink-gray-5"
-				:title="chapter.title"
-				data-testid="map-chapter"
-				>{{ chapter.title }}</span
+			<button
+				v-for="lesson in chapter.lessons"
+				:key="lesson.id"
+				type="button"
+				class="dot-button group"
+				:aria-label="labelOf(lesson)"
+				:aria-current="lesson.index === current ? 'step' : undefined"
+				:data-status="lesson.status"
+				:data-next="lesson.id === nextLesson ? '' : undefined"
+				@click="$emit('select', lesson.index)"
 			>
-			<div class="flex items-center">
-				<button
-					v-for="lesson in chapter.lessons"
-					:key="lesson.id"
-					type="button"
-					class="dot-button group"
-					:aria-label="labelOf(lesson)"
-					:aria-current="lesson.index === current ? 'step' : undefined"
-					:data-status="lesson.status"
-					:data-next="lesson.id === nextLesson ? '' : undefined"
-					@click="$emit('select', lesson.index)"
-				>
-					<span class="dot" :class="dotClass(lesson)">
-						<svg
-							v-if="lesson.status !== 'completed'"
-							class="dot-ring"
-							viewBox="0 0 32 32"
-							aria-hidden="true"
-						>
-							<circle class="dot-ring-track" cx="16" cy="16" :r="RADIUS" />
-							<circle
-								v-if="lesson.coverage > 0"
-								class="dot-ring-fill"
-								cx="16"
-								cy="16"
-								:r="RADIUS"
-								:stroke-dasharray="`${
-									lesson.coverage * CIRCUMFERENCE
-								} ${CIRCUMFERENCE}`"
-							/>
-						</svg>
-						<span
-							v-if="lesson.status === 'completed'"
-							class="lucide-check size-3.5"
-							aria-hidden="true"
+				<span class="dot" :class="dotClass(lesson)">
+					<svg
+						v-if="lesson.status !== 'completed'"
+						class="dot-ring"
+						viewBox="0 0 32 32"
+						aria-hidden="true"
+					>
+						<circle class="dot-ring-track" cx="16" cy="16" :r="RADIUS" />
+						<circle
+							v-if="lesson.coverage > 0"
+							class="dot-ring-fill"
+							cx="16"
+							cy="16"
+							:r="RADIUS"
+							:stroke-dasharray="`${
+								lesson.coverage * CIRCUMFERENCE
+							} ${CIRCUMFERENCE}`"
 						/>
-						<span v-else aria-hidden="true">{{ lesson.number }}</span>
-					</span>
+					</svg>
 					<span
-						class="current-bar"
-						:class="{ 'is-current': lesson.index === current }"
+						v-if="lesson.status === 'completed'"
+						class="lucide-check size-3.5"
 						aria-hidden="true"
 					/>
-				</button>
-			</div>
+					<span v-else aria-hidden="true">{{ lesson.number }}</span>
+				</span>
+				<span
+					class="current-bar"
+					:class="{ 'is-current': lesson.index === current }"
+					aria-hidden="true"
+				/>
+			</button>
 		</div>
 	</nav>
 </template>

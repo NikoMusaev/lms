@@ -97,11 +97,7 @@
 					<h2 class="text-3xl-semibold text-ink-gray-9 mb-4">
 						{{ __('Course program') }}
 					</h2>
-					<CourseProgram
-						:program="program"
-						:courseName="course.data.name"
-						:enrolled="Boolean(course.data.membership)"
-					/>
+					<CourseProgram :program="program" :courseName="course.data.name" />
 				</section>
 
 				<section v-else>
@@ -156,8 +152,9 @@
 			<aside
 				class="hidden md:flex w-80 shrink-0 flex-col space-y-6 self-start sticky top-5"
 			>
+				<!-- Just the way in: the author is in the header already
+				(learning-services#326). -->
 				<CourseCardOverlay :course="course" />
-				<CourseCreatorCard :instructors="course.data.instructors || []" />
 			</aside>
 		</div>
 
@@ -181,7 +178,6 @@ import CourseProgram from '@/components/CourseProgram/CourseProgram.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import CourseReviews from '@/components/CourseReviews.vue'
 import CourseInstructors from '@/components/CourseInstructors.vue'
-import CourseCreatorCard from '@/components/CourseCreatorCard.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import RelatedCourses from '@/components/RelatedCourses.vue'
 import type { ProgramData } from '@/utils/courseProgram'

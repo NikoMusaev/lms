@@ -81,15 +81,16 @@
 			</button>
 		</section>
 
-		<div class="mt-auto pt-6">
+		<!-- A way to the lesson, not a second call to action: the course card
+		holds the one button (learning-services#326). -->
+		<div class="mt-auto pt-5">
 			<a
-				:href="safeUrl(action.url)"
+				:href="safeUrl(lessonUrl)"
 				data-testid="slide-action"
-				class="inline-block"
+				class="inline-flex items-center gap-1 text-p-sm font-medium text-ink-gray-8 hover:text-ink-gray-9"
 			>
-				<Button variant="solid" size="md">
-					{{ action.label }}
-				</Button>
+				{{ __('Open lesson') }}
+				<span class="lucide-arrow-right size-4" aria-hidden="true" />
 			</a>
 		</div>
 	</article>
@@ -97,7 +98,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button } from 'frappe-ui'
 import { safeUrl } from '@/utils/safeUrl'
 import {
 	topicCount,
@@ -111,13 +111,8 @@ const props = defineProps<{
 	status: LessonStatus
 	position: number
 	total: number
-	/** Where studying this lesson leads, from lesson_entry; absent until asked. */
-	study?: { channel: 'web' | 'agent'; url: string } | null
-	/**
-	 * The lesson page. The button goes there until `study` answers, and for a
-	 * visitor or a student not enrolled — the page offers to log in or enrol.
-	 */
-	fallbackUrl: string
+	/** The lesson page: it offers the way in, or a log-in or enrolment. */
+	lessonUrl: string
 }>()
 
 // Six fit a slide without pushing the button off a laptop screen.
@@ -152,19 +147,6 @@ const statusClass = computed(() =>
 		? 'bg-surface-green-2 text-ink-green-8'
 		: 'bg-surface-gray-2 text-ink-gray-7'
 )
-
-const action = computed(() => {
-	if (props.status === 'none')
-		return { label: __('Enroll to study'), url: props.fallbackUrl }
-	const url = props.study?.url || props.fallbackUrl
-	if (props.study?.channel === 'agent')
-		return { label: __('Connect your agent'), url }
-	if (props.status === 'completed')
-		return { label: __('Repeat with your mentor'), url }
-	if (props.status === 'in-progress')
-		return { label: __('Continue with your mentor'), url }
-	return { label: __('Study with your mentor'), url }
-})
 
 function marker(objective: ProgramObjective): string {
 	if (objective.status === 'covered') return '●'

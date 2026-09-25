@@ -566,10 +566,10 @@ const lesson = createResource({
 	auto: true,
 })
 
-// A lesson on this platform is taught by a mentor — in the platform's web chat
+// A lesson on this platform is taught by an agent — in the platform's web chat
 // or through the student's own agent — so a student opening it here is shown
 // the way into that session instead of the material, which is written for the
-// mentor. The answer comes from lms_frappe_app (learning-services#309).
+// agent. The answer comes from lms_frappe_app (learning-services#309).
 //
 // `content` is the fallback for everything else: an editor reviewing the
 // lesson, a visitor on a preview lesson, and a site without the app, which
@@ -718,7 +718,7 @@ const markProgress = () => {
 	// membership row so save_progress would no-op server-side but still
 	// flip the in-memory `completedLesson` and show a green tick that
 	// vanishes on refresh.
-	// A lesson shown as the way into a mentor session is not being read, and
+	// A lesson shown as the way into an agent session is not being read, and
 	// the server refuses to close it on a timer anyway (lms_frappe_app,
 	// learning-services#305); asking would only log a refusal per visit.
 	if (

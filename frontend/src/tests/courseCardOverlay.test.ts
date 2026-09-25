@@ -3,7 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { reactive } from 'vue'
 
 // learning-services#301: an enrolled student continues straight into the
-// mentor session on the next open lesson; without an answer from
+// agent session on the next open lesson; without an answer from
 // lms_frappe_app the reader link stays.
 
 const entryResource = reactive<{ data: unknown; fetch: ReturnType<typeof vi.fn> }>({
@@ -74,7 +74,7 @@ describe('CourseCardOverlay for an enrolled student', () => {
 		expect(entryResource.fetch).toHaveBeenCalled()
 	})
 
-	it('continues straight into the mentor session', async () => {
+	it('continues straight into the agent session', async () => {
 		entryResource.data = {
 			ok: true,
 			data: {
@@ -89,7 +89,7 @@ describe('CourseCardOverlay for an enrolled student', () => {
 		expect(wrapper.get('[data-testid="course-study"]').attributes('href')).toBe(
 			'https://lms.example.com/chat?lesson=l-2'
 		)
-		expect(wrapper.text()).toContain('Continue with your mentor')
+		expect(wrapper.text()).toContain('Continue with the agent')
 		expect(wrapper.text()).toContain('Next: Цели и источники')
 		expect(wrapper.find('[data-testid="reader"]').exists()).toBe(false)
 	})
