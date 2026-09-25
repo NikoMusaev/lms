@@ -9892,3 +9892,43 @@ msgstr "Не дошли"
 #: frontend/src/components/CourseMap.vue
 msgid "No objectives yet"
 msgstr "Цели пока не заданы"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "This lesson is a conversation with a mentor"
+msgstr "Этот урок — разговор с наставником"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Lesson completed"
+msgstr "Урок пройден"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Study with your mentor"
+msgstr "Заниматься с наставником"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Repeat with your mentor"
+msgstr "Повторить с наставником"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Connect your agent"
+msgstr "Подключить своего агента"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Trial lessons in the browser are used up. Lessons continue with your own agent, and your progress is kept."
+msgstr "Пробные уроки в браузере пройдены. Дальше занятия идут через вашего агента, прогресс сохранится."
+
+#: frontend/src/components/LessonEntry.vue
+msgid "In the browser, trial lessons left: {0}"
+msgstr "В браузере, пробных уроков осталось: {0}"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "In the browser, with the platform mentor"
+msgstr "В браузере, с наставником платформы"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Have your own AI agent?"
+msgstr "Есть свой AI-агент?"
+
+#: frontend/src/components/LessonEntry.vue
+msgid "Connect it"
+msgstr "Подключите его"
