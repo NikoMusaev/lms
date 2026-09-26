@@ -137,6 +137,9 @@ function handleClick(): void {
 const isActive = computed<boolean>(() => {
 	return Boolean(
 		props.link?.activeFor?.includes(router.currentRoute.value.name as string) ||
+			// A route can name the sidebar page that leads to it (Documents).
+			(props.link?.to &&
+				router.currentRoute.value.meta?.sidebarLink === props.link.to) ||
 			(props.activeTab && props.link?.label?.includes(props.activeTab))
 	)
 })

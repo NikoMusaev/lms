@@ -148,6 +148,35 @@ export const routes = [
 		component: () => import('@/pages/Billing.vue'),
 		props: true,
 	},
+	// «Мои документы» (learning-services#331): the documents a student builds
+	// through a course. `sidebarLink` names the admin's sidebar page that leads
+	// here, so it lights up; the alias under that page's route keeps the click
+	// inside the SPA instead of a round trip through Frappe's redirect.
+	{
+		path: '/documents',
+		name: 'Documents',
+		component: () => import('@/pages/Documents/Documents.vue'),
+		meta: { sidebarLink: 'artifacts-sidebar' },
+	},
+	{
+		path: '/artifacts-sidebar',
+		name: 'artifacts-sidebar',
+		redirect: { name: 'Documents' },
+	},
+	{
+		path: '/documents/:courseName/:artifact',
+		name: 'Document',
+		component: () => import('@/pages/Documents/Document.vue'),
+		props: true,
+		meta: { sidebarLink: 'artifacts-sidebar' },
+	},
+	{
+		path: '/documents/:courseName/:artifact/report/:table',
+		name: 'DocumentReport',
+		component: () => import('@/pages/Documents/DocumentReport.vue'),
+		props: true,
+		meta: { sidebarLink: 'artifacts-sidebar' },
+	},
 	{
 		path: '/statistics',
 		name: 'Statistics',
