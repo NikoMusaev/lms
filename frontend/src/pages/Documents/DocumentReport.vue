@@ -3,7 +3,11 @@
 		<div class="print:hidden">
 			<PageHeader :breadcrumbs="breadcrumbs">
 				<template #actions>
-					<Button variant="solid" :label="__('Print or save as PDF')" @click="print">
+					<Button
+						variant="solid"
+						:label="__('Print or save as PDF')"
+						@click="print"
+					>
 						<template #prefix>
 							<span class="lucide-printer size-4" />
 						</template>
@@ -16,14 +20,19 @@
 			<LoadingIndicator class="size-5 text-ink-gray-5" />
 		</div>
 
-		<article v-else-if="doc && report" class="mx-auto max-w-4xl space-y-5 p-5 print:p-0">
+		<article
+			v-else-if="doc && report"
+			class="mx-auto max-w-4xl space-y-5 p-5 print:p-0"
+		>
 			<header class="space-y-1">
 				<p class="text-p-sm text-ink-gray-5">{{ courseTitle }} · {{ today }}</p>
 				<h1 class="text-2xl-semibold text-ink-gray-9">{{ report.title }}</h1>
 			</header>
 
 			<p v-if="!report.rows.length" class="text-p-base text-ink-gray-6">
-				{{ __('No rows are ticked for the report yet. Tick them in the table.') }}
+				{{
+					__('No rows are ticked for the report yet. Tick them in the table.')
+				}}
 			</p>
 
 			<ol v-else class="space-y-4">
@@ -57,7 +66,12 @@
 
 <script setup lang="ts">
 import { computed, toRef } from 'vue'
-import { Button, createResource, LoadingIndicator, usePageMeta } from 'frappe-ui'
+import {
+	Button,
+	createResource,
+	LoadingIndicator,
+	usePageMeta,
+} from 'frappe-ui'
 import PageHeader from '@/components/Layouts/PageHeader.vue'
 import { useDocument } from '@/composables/useDocument'
 import {
@@ -69,7 +83,11 @@ import {
 	type ReportView,
 } from '@/utils/documentTable'
 
-const props = defineProps<{ courseName: string; artifact: string; table: string }>()
+const props = defineProps<{
+	courseName: string
+	artifact: string
+	table: string
+}>()
 
 const api = useDocument(toRef(props, 'courseName'), toRef(props, 'artifact'))
 const doc = api.document
@@ -81,18 +99,23 @@ const courseMap = createResource({
 	auto: true,
 })
 const courseTitle = computed(
-	() => (courseMap.data as { data?: { title?: string } } | null)?.data?.title ?? ''
+	() =>
+		(courseMap.data as { data?: { title?: string } } | null)?.data?.title ?? ''
 )
 
 const today = new Date().toLocaleDateString('ru-RU')
 
 const report = computed(() => {
 	const table = doc.value?.tables[props.table]
-	const view = table?.views.find((v) => v.type === 'report') as ReportView | undefined
+	const view = table?.views.find((v) => v.type === 'report') as
+		| ReportView
+		| undefined
 	if (!table || !view) return null
 	const { columns, rows } = reportRows(table, view)
 	const field = view.field
-		? doc.value?.blocks.flatMap((b) => b.fields ?? []).find((f) => f.key === view.field)
+		? doc.value?.blocks
+				.flatMap((b) => b.fields ?? [])
+				.find((f) => f.key === view.field)
 		: undefined
 	return {
 		title: view.title || __('Report for the sponsor'),
@@ -108,7 +131,9 @@ function cell(column: DocColumn, row: DocRow): string {
 	const option = cellOptions(column, doc.value?.tables ?? {}).find(
 		(o) => String(o.value) === String(row[column.key])
 	)
-	return option && column.type !== 'select' ? option.label : formatCell(column, row[column.key])
+	return option && column.type !== 'select'
+		? option.label
+		: formatCell(column, row[column.key])
 }
 
 const breadcrumbs = computed(() => [

@@ -14,7 +14,9 @@
 			<span
 				v-if="typeof value === 'boolean'"
 				class="inline-flex items-center rounded px-1.5 py-0.5 text-p-xs font-medium"
-				:class="value ? 'bg-surface-amber-2 text-ink-amber-8' : 'text-ink-gray-4'"
+				:class="
+					value ? 'bg-surface-amber-2 text-ink-amber-8' : 'text-ink-gray-4'
+				"
 				>{{ value ? __('Yes') : __('No') }}</span
 			>
 			<span v-else class="tabular-nums font-medium text-ink-gray-8">{{
@@ -71,7 +73,7 @@
 				class="doc-input"
 				:value="value ?? ''"
 				:aria-label="`${row.id} — ${column.title}`"
-				@keydown.enter.prevent="($event.target as HTMLInputElement).blur()"
+				@keydown.enter.prevent=";($event.target as HTMLInputElement).blur()"
 				@keydown.esc.prevent="cancel"
 				@blur="saveText(($event.target as HTMLInputElement).value)"
 			/>
@@ -82,7 +84,9 @@
 				class="doc-input resize-y"
 				:value="(value as string) ?? ''"
 				:aria-label="`${row.id} — ${column.title}`"
-				@keydown.enter.exact.prevent="($event.target as HTMLTextAreaElement).blur()"
+				@keydown.enter.exact.prevent="
+					;($event.target as HTMLTextAreaElement).blur()
+				"
 				@keydown.esc.prevent="cancel"
 				@blur="saveText(($event.target as HTMLTextAreaElement).value)"
 			/>
@@ -95,8 +99,12 @@
 			:aria-label="`${row.id} — ${column.title}: ${shown || __('empty')}`"
 			@click="startEditing"
 		>
-			<span v-if="shown" class="whitespace-pre-line break-words">{{ shown }}</span>
-			<span v-else-if="missing" class="text-ink-red-4">{{ __('Fill in') }}</span>
+			<span v-if="shown" class="whitespace-pre-line break-words">{{
+				shown
+			}}</span>
+			<span v-else-if="missing" class="text-ink-red-4">{{
+				__('Fill in')
+			}}</span>
 		</button>
 	</div>
 </template>
@@ -123,7 +131,9 @@ const props = defineProps<{
 const emit = defineEmits<{ save: [value: CellValue] }>()
 
 const editing = ref(false)
-const input = ref<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null>(null)
+const input = ref<
+	HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+>(null)
 let cancelled = false
 
 const value = computed(() => props.row[props.column.key])
@@ -133,7 +143,9 @@ const clarify = computed(() => isToClarify(value.value))
 
 // A scale cell shows its label too: «4 — Вероятно» says more than «4».
 const shown = computed(() => {
-	const option = options.value.find((o) => String(o.value) === String(value.value))
+	const option = options.value.find(
+		(o) => String(o.value) === String(value.value)
+	)
 	if (option && props.column.type !== 'select') return option.label
 	return formatCell(props.column, value.value)
 })
@@ -153,7 +165,9 @@ function cancel() {
 function save(next: CellValue) {
 	editing.value = false
 	const typed =
-		props.column.type === 'scale' && next !== '' && next !== null ? Number(next) : next
+		props.column.type === 'scale' && next !== '' && next !== null
+			? Number(next)
+			: next
 	if (String(typed ?? '') === String(value.value ?? '')) return
 	emit('save', typed === '' ? null : typed)
 }

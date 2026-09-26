@@ -125,7 +125,10 @@ export const isToClarify = (value: CellValue): boolean =>
 	typeof value === 'string' && /^\s*уточнить(?:\s|$)/i.test(value)
 
 /** The table's columns under the block that adds them, in schema order. */
-export function columnGroups(table: DocTable, blocks: DocBlock[]): ColumnGroup[] {
+export function columnGroups(
+	table: DocTable,
+	blocks: DocBlock[]
+): ColumnGroup[] {
 	const titles = new Map(blocks.map((b) => [b.key, b.title]))
 	const groups: ColumnGroup[] = []
 	for (const column of table.columns) {
@@ -149,7 +152,9 @@ export function isRequired(column: DocColumn, row: DocRow): boolean {
 }
 
 export const isMissing = (column: DocColumn, row: DocRow): boolean =>
-	column.type !== 'formula' && isRequired(column, row) && isBlank(row[column.key])
+	column.type !== 'formula' &&
+	isRequired(column, row) &&
+	isBlank(row[column.key])
 
 /** The first text column: what names a row where there is room for one cell. */
 export function titleColumn(table: DocTable): DocColumn | undefined {
@@ -164,7 +169,8 @@ export function titleColumn(table: DocTable): DocColumn | undefined {
 export const flagColumns = (table: DocTable): DocColumn[] =>
 	table.columns.filter(
 		(c) =>
-			c.type === 'formula' && table.rows.some((r) => typeof r[c.key] === 'boolean')
+			c.type === 'formula' &&
+			table.rows.some((r) => typeof r[c.key] === 'boolean')
 	)
 
 export interface RowFilter {
@@ -232,7 +238,9 @@ export function scaleLabels(
 	const labels = new Map<number, string>()
 	const source = column.labels ? tables[column.labels] : undefined
 	if (!source) return labels
-	const value = source.columns.find((c) => c.type === 'number' || c.type === 'scale')
+	const value = source.columns.find(
+		(c) => c.type === 'number' || c.type === 'scale'
+	)
 	const label = source.columns.find((c) => c.type === 'text')
 	if (!value || !label) return labels
 	for (const row of source.rows) {
@@ -254,7 +262,10 @@ export function cellOptions(
 		const labels = scaleLabels(column, tables)
 		const out = []
 		for (let n = column.min ?? 1; n <= (column.max ?? 5); n++)
-			out.push({ value: n, label: labels.has(n) ? `${n} — ${labels.get(n)}` : String(n) })
+			out.push({
+				value: n,
+				label: labels.has(n) ? `${n} — ${labels.get(n)}` : String(n),
+			})
 		return out
 	}
 	if (column.type === 'ref' && column.ref && tables[column.ref]) {
@@ -325,9 +336,13 @@ export function reportRows(
 }
 
 /** A cell as text: numbers without «.0», ticks as «да», dates as the locale writes them. */
-export function formatCell(column: Pick<DocColumn, 'type'>, value: CellValue): string {
+export function formatCell(
+	column: Pick<DocColumn, 'type'>,
+	value: CellValue
+): string {
 	if (isBlank(value)) return ''
-	if (column.type === 'check' || typeof value === 'boolean') return value ? '✓' : ''
+	if (column.type === 'check' || typeof value === 'boolean')
+		return value ? '✓' : ''
 	if (column.type === 'date' && typeof value === 'string') {
 		const [y, m, d] = value.split('-')
 		return y && m && d ? `${d}.${m}.${y}` : value

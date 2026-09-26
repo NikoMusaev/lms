@@ -8,14 +8,20 @@
 				<Dropdown
 					v-if="doc"
 					:options="downloads"
-					:button="{ label: __('Download'), variant: 'subtle', iconLeft: 'download' }"
+					:button="{
+						label: __('Download'),
+						variant: 'subtle',
+						iconLeft: 'download',
+					}"
 				/>
 			</template>
 		</PageHeader>
 
 		<div v-if="!isLoggedIn" class="p-5 text-p-base text-ink-gray-7">
 			{{ __('Your documents are visible only to you.') }}
-			<a href="/login?redirect-to=/lms/documents" class="underline">{{ __('Log in') }}</a>
+			<a href="/login?redirect-to=/lms/documents" class="underline">{{
+				__('Log in')
+			}}</a>
 		</div>
 
 		<div
@@ -28,7 +34,9 @@
 		<div v-else-if="!doc" class="p-5 text-p-base text-ink-gray-7">
 			{{
 				api.refusal.value?.message ||
-				__('This document is not available: the course is not yours or the document is gone.')
+				__(
+					'This document is not available: the course is not yours or the document is gone.'
+				)
 			}}
 			<router-link :to="{ name: 'Documents' }" class="underline">{{
 				__('All documents')
@@ -44,7 +52,12 @@
 			>
 				<div class="mb-3 space-y-1.5">
 					<div class="text-p-sm text-ink-gray-6">
-						{{ __('Filled {0} of {1}').format(String(filledCount), String(doc.blocks.length)) }}
+						{{
+							__('Filled {0} of {1}').format(
+								String(filledCount),
+								String(doc.blocks.length)
+							)
+						}}
 					</div>
 					<ProgressBar :progress="progress" />
 				</div>
@@ -75,7 +88,12 @@
 					<h1 class="text-2xl-semibold text-ink-gray-9">{{ doc.title }}</h1>
 					<p class="text-p-sm text-ink-gray-6">
 						{{ courseTitle }} ·
-						{{ __('Filled {0} of {1}').format(String(filledCount), String(doc.blocks.length)) }}
+						{{
+							__('Filled {0} of {1}').format(
+								String(filledCount),
+								String(doc.blocks.length)
+							)
+						}}
 					</p>
 				</div>
 
@@ -98,7 +116,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, toRef } from 'vue'
-import { createResource, Dropdown, LoadingIndicator, usePageMeta } from 'frappe-ui'
+import {
+	createResource,
+	Dropdown,
+	LoadingIndicator,
+	usePageMeta,
+} from 'frappe-ui'
 import PageHeader from '@/components/Layouts/PageHeader.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import DocumentBlock from '@/components/Documents/DocumentBlock.vue'
@@ -124,9 +147,14 @@ const courseMap = createResource({
 })
 const mapData = computed(
 	() =>
-		(courseMap.data as {
-			data?: { title?: string; chapters?: { lessons: { id: string; number: number }[] }[] }
-		} | null)?.data
+		(
+			courseMap.data as {
+				data?: {
+					title?: string
+					chapters?: { lessons: { id: string; number: number }[] }[]
+				}
+			} | null
+		)?.data
 )
 const courseTitle = computed(() => mapData.value?.title ?? props.courseName)
 const lessonNumbers = computed(() => {
@@ -138,9 +166,13 @@ const lessonNumbers = computed(() => {
 
 const isFilled = (block: DocBlock): boolean =>
 	block.filled ?? Boolean(block.content || block.file || block.url)
-const filledCount = computed(() => doc.value?.blocks.filter(isFilled).length ?? 0)
+const filledCount = computed(
+	() => doc.value?.blocks.filter(isFilled).length ?? 0
+)
 const progress = computed(() =>
-	doc.value?.blocks.length ? Math.round((filledCount.value / doc.value.blocks.length) * 100) : 0
+	doc.value?.blocks.length
+		? Math.round((filledCount.value / doc.value.blocks.length) * 100)
+		: 0
 )
 
 const breadcrumbs = computed(() => [
@@ -171,7 +203,9 @@ let unfocus: ReturnType<typeof setTimeout> | undefined
 async function focusBlock(key: string) {
 	focused.value = key
 	await nextTick()
-	document.getElementById(`block-${key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+	document
+		.getElementById(`block-${key}`)
+		?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 	clearTimeout(unfocus)
 	unfocus = setTimeout(() => (focused.value = null), 1600)
 }

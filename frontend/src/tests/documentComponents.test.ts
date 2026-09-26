@@ -48,34 +48,104 @@ const register: DocTable = {
 	markdown: '',
 	views: [],
 	columns: [
-		{ key: 'event', title: 'Событие', type: 'text', block: 'risks', required: true },
-		{ key: 'probability', title: 'Вероятность', type: 'scale', block: 'assessment', min: 1, max: 5, required: true },
+		{
+			key: 'event',
+			title: 'Событие',
+			type: 'text',
+			block: 'risks',
+			required: true,
+		},
+		{
+			key: 'probability',
+			title: 'Вероятность',
+			type: 'scale',
+			block: 'assessment',
+			min: 1,
+			max: 5,
+			required: true,
+		},
 		{ key: 'rank', title: 'Ранг', type: 'formula', block: 'assessment' },
 		{ key: 'in_work', title: 'В работе', type: 'formula', block: 'assessment' },
 	],
 	rows: [
-		{ id: 'R1', event: 'Подрядчик уйдёт', probability: 4, rank: 16, in_work: true },
+		{
+			id: 'R1',
+			event: 'Подрядчик уйдёт',
+			probability: 4,
+			rank: 16,
+			in_work: true,
+		},
 		{ id: 'R2', event: 'уточнить у Анны', in_work: null },
 	],
 }
 
 const blocks = [
-	{ key: 'risks', title: 'Риски', hint: '', lesson: null, span: 1, kind: 'text', accept: [], content: '', file: null, url: null, preview: null, table: 'register', columns: register.columns.slice(0, 1), fields: [], filled: true, empty_cells: [] },
-	{ key: 'assessment', title: 'Оценка', hint: 'Готов, когда…', lesson: null, span: 1, kind: 'text', accept: [], content: '', file: null, url: null, preview: null, table: 'register', columns: register.columns.slice(1), fields: [{ key: 'threshold', title: 'Порог внимания', type: 'number', required: true }], filled: false, empty_cells: [{ row: 'R2', column: 'probability' }] },
+	{
+		key: 'risks',
+		title: 'Риски',
+		hint: '',
+		lesson: null,
+		span: 1,
+		kind: 'text',
+		accept: [],
+		content: '',
+		file: null,
+		url: null,
+		preview: null,
+		table: 'register',
+		columns: register.columns.slice(0, 1),
+		fields: [],
+		filled: true,
+		empty_cells: [],
+	},
+	{
+		key: 'assessment',
+		title: 'Оценка',
+		hint: 'Готов, когда…',
+		lesson: null,
+		span: 1,
+		kind: 'text',
+		accept: [],
+		content: '',
+		file: null,
+		url: null,
+		preview: null,
+		table: 'register',
+		columns: register.columns.slice(1),
+		fields: [
+			{
+				key: 'threshold',
+				title: 'Порог внимания',
+				type: 'number',
+				required: true,
+			},
+		],
+		filled: false,
+		empty_cells: [{ row: 'R2', column: 'probability' }],
+	},
 ] as DocumentData['blocks']
 
 describe('TableCell', () => {
 	it('shows a formula read-only and a blank required cell as one to fill', () => {
-		const rank = mount(TableCell, { props: { row: register.rows[0], column: register.columns[2], tables: {} }, global })
+		const rank = mount(TableCell, {
+			props: { row: register.rows[0], column: register.columns[2], tables: {} },
+			global,
+		})
 		expect(rank.text()).toBe('16')
 		expect(rank.find('button').exists()).toBe(false)
 
-		const blank = mount(TableCell, { props: { row: register.rows[1], column: register.columns[1], tables: {} }, global })
+		const blank = mount(TableCell, {
+			props: { row: register.rows[1], column: register.columns[1], tables: {} },
+			global,
+		})
 		expect(blank.classes()).toContain('is-missing')
 	})
 
 	it('saves a scale as a number, and nothing when unchanged', async () => {
-		const cell = mount(TableCell, { props: { row: register.rows[0], column: register.columns[1], tables: {} }, global })
+		const cell = mount(TableCell, {
+			props: { row: register.rows[0], column: register.columns[1], tables: {} },
+			global,
+		})
 		await cell.get('button').trigger('click')
 		const select = cell.get('select')
 		await select.setValue('4')
@@ -86,7 +156,10 @@ describe('TableCell', () => {
 	})
 
 	it('marks «уточнить у …»', () => {
-		const cell = mount(TableCell, { props: { row: register.rows[1], column: register.columns[0], tables: {} }, global })
+		const cell = mount(TableCell, {
+			props: { row: register.rows[1], column: register.columns[0], tables: {} },
+			global,
+		})
 		expect(cell.classes()).toContain('is-clarify')
 	})
 })
@@ -94,12 +167,19 @@ describe('TableCell', () => {
 describe('DocTableEditor', () => {
 	const editor = () =>
 		mount(DocTableEditor, {
-			props: { table: register, tables: { register }, blocks, canEditRows: true },
+			props: {
+				table: register,
+				tables: { register },
+				blocks,
+				canEditRows: true,
+			},
 			global,
 		})
 
 	it('heads columns by the block that adds them', () => {
-		const heads = editor().findAll('thead tr:first-child th').map((th) => th.text())
+		const heads = editor()
+			.findAll('thead tr:first-child th')
+			.map((th) => th.text())
 		expect(heads).toEqual(['ID', 'Риски', 'Оценка', 'Row actions'])
 	})
 
@@ -107,10 +187,14 @@ describe('DocTableEditor', () => {
 		const wrapper = editor()
 		const [inWork, empty] = wrapper.findAll('button.chip')
 		await inWork.trigger('click')
-		expect(wrapper.findAll('tbody tr[data-row]').map((r) => r.attributes('data-row'))).toEqual(['R1'])
+		expect(
+			wrapper.findAll('tbody tr[data-row]').map((r) => r.attributes('data-row'))
+		).toEqual(['R1'])
 		await inWork.trigger('click')
 		await empty.trigger('click')
-		expect(wrapper.findAll('tbody tr[data-row]').map((r) => r.attributes('data-row'))).toEqual(['R2'])
+		expect(
+			wrapper.findAll('tbody tr[data-row]').map((r) => r.attributes('data-row'))
+		).toEqual(['R2'])
 	})
 
 	it('asks before deleting a row', async () => {
@@ -123,13 +207,35 @@ describe('DocTableEditor', () => {
 })
 
 describe('DocumentBlock', () => {
-	const document = { course: 'c1', artifact: 'risk_register', title: 'Реестр', layout: 'sections', blocks, tables: { register }, fields: {} } as DocumentData
-	const api = { setField: vi.fn(), setCell: vi.fn(), addRow: vi.fn(), deleteRow: vi.fn(), write: vi.fn(), upload: vi.fn() }
+	const document = {
+		course: 'c1',
+		artifact: 'risk_register',
+		title: 'Реестр',
+		layout: 'sections',
+		blocks,
+		tables: { register },
+		fields: {},
+	} as DocumentData
+	const api = {
+		setField: vi.fn(),
+		setCell: vi.fn(),
+		addRow: vi.fn(),
+		deleteRow: vi.fn(),
+		write: vi.fn(),
+		upload: vi.fn(),
+	}
 
 	it('draws the whole table at the block that starts its rows, the own columns elsewhere', () => {
-		const owner = mount(DocumentBlock, { props: { block: blocks[0], document, api: api as never }, global })
-		const other = mount(DocumentBlock, { props: { block: blocks[1], document, api: api as never }, global })
-		const heads = (w: typeof owner) => w.findAll('thead tr:first-child th').map((th) => th.text())
+		const owner = mount(DocumentBlock, {
+			props: { block: blocks[0], document, api: api as never },
+			global,
+		})
+		const other = mount(DocumentBlock, {
+			props: { block: blocks[1], document, api: api as never },
+			global,
+		})
+		const heads = (w: typeof owner) =>
+			w.findAll('thead tr:first-child th').map((th) => th.text())
 		expect(heads(owner)).toEqual(['ID', 'Риски', 'Оценка', 'Row actions'])
 		// Another lesson's block: the row's name and its own columns, no rows to add.
 		expect(heads(other)).toEqual(['ID', 'Реестр', 'Оценка'])
@@ -140,7 +246,10 @@ describe('DocumentBlock', () => {
 	})
 
 	it('saves a field through the document api', async () => {
-		const wrapper = mount(DocumentBlock, { props: { block: blocks[1], document, api: api as never }, global })
+		const wrapper = mount(DocumentBlock, {
+			props: { block: blocks[1], document, api: api as never },
+			global,
+		})
 		const input = wrapper.get('[data-testid="block-fields"] input')
 		await input.setValue('12')
 		await input.trigger('change')
@@ -149,7 +258,10 @@ describe('DocumentBlock', () => {
 	})
 
 	it('says what the block lacks', () => {
-		const wrapper = mount(DocumentBlock, { props: { block: blocks[1], document, api: api as never }, global })
+		const wrapper = mount(DocumentBlock, {
+			props: { block: blocks[1], document, api: api as never },
+			global,
+		})
 		expect(wrapper.get('[data-testid="block-status"]').text()).toBe('1 to fill')
 	})
 })

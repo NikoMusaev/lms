@@ -24,7 +24,9 @@
 				@click="flagFilter = flagFilter === flag.key ? null : flag.key"
 			>
 				{{ flag.title }}
-				<span class="tabular-nums text-ink-gray-5">{{ flagCount(flag.key) }}</span>
+				<span class="tabular-nums text-ink-gray-5">{{
+					flagCount(flag.key)
+				}}</span>
 			</button>
 			<button
 				type="button"
@@ -37,11 +39,19 @@
 				<span class="tabular-nums text-ink-gray-5">{{ missingRows }}</span>
 			</button>
 			<div class="ms-auto text-p-sm text-ink-gray-5 tabular-nums">
-				{{ __('{0} of {1} rows').format(String(rows.length), String(table.rows.length)) }}
+				{{
+					__('{0} of {1} rows').format(
+						String(rows.length),
+						String(table.rows.length)
+					)
+				}}
 			</div>
 		</div>
 
-		<div v-if="!only && groups.length > 1" class="flex flex-wrap items-center gap-1.5">
+		<div
+			v-if="!only && groups.length > 1"
+			class="flex flex-wrap items-center gap-1.5"
+		>
 			<span class="text-p-xs text-ink-gray-5">{{ __('Columns') }}:</span>
 			<button
 				v-for="group in groups"
@@ -149,7 +159,10 @@
 								:row="row"
 								:column="column"
 								:tables="tables"
-								@save="(value) => $emit('setCell', column.block, row, column.key, value)"
+								@save="
+									(value) =>
+										$emit('setCell', column.block, row, column.key, value)
+								"
 							/>
 						</td>
 						<td v-if="canEditRows" class="w-10 text-center">
@@ -170,7 +183,11 @@
 							:colspan="shownColumns.length + (canEditRows ? 2 : 1)"
 							class="px-3 py-6 text-center text-p-sm text-ink-gray-5"
 						>
-							{{ table.rows.length ? __('No rows match the filter') : __('No rows yet') }}
+							{{
+								table.rows.length
+									? __('No rows match the filter')
+									: __('No rows yet')
+							}}
 						</td>
 					</tr>
 				</tbody>
@@ -183,11 +200,16 @@
 				v-for="row in rows"
 				:key="row.id"
 				class="rounded-md border border-outline-gray-2 bg-surface-base"
-				:class="{ 'border-s-4 border-s-outline-amber-4': flags[0] && row[flags[0].key] === true }"
+				:class="{
+					'border-s-4 border-s-outline-amber-4':
+						flags[0] && row[flags[0].key] === true,
+				}"
 				:data-row="row.id"
 			>
 				<summary class="flex cursor-pointer items-start gap-2 p-3">
-					<span class="shrink-0 text-p-sm font-medium text-ink-gray-5">{{ row.id }}</span>
+					<span class="shrink-0 text-p-sm font-medium text-ink-gray-5">{{
+						row.id
+					}}</span>
 					<span class="min-w-0 flex-1 text-p-sm text-ink-gray-9">
 						{{ (title && row[title.key]) || __('Untitled') }}
 					</span>
@@ -207,12 +229,17 @@
 							:key="column.key"
 							class="grid grid-cols-[7rem_1fr] items-start gap-2 py-0.5"
 						>
-							<span class="pt-2 text-p-xs text-ink-gray-6">{{ column.title }}</span>
+							<span class="pt-2 text-p-xs text-ink-gray-6">{{
+								column.title
+							}}</span>
 							<TableCell
 								:row="row"
 								:column="column"
 								:tables="tables"
-								@save="(value) => $emit('setCell', column.block, row, column.key, value)"
+								@save="
+									(value) =>
+										$emit('setCell', column.block, row, column.key, value)
+								"
 							/>
 						</div>
 					</section>
@@ -227,7 +254,9 @@
 				</div>
 			</details>
 			<p v-if="!rows.length" class="py-4 text-center text-p-sm text-ink-gray-5">
-				{{ table.rows.length ? __('No rows match the filter') : __('No rows yet') }}
+				{{
+					table.rows.length ? __('No rows match the filter') : __('No rows yet')
+				}}
 			</p>
 		</div>
 
@@ -325,7 +354,14 @@ const shownGroups = computed(() => {
 		const name = title.value
 		// A row needs its name beside the block's columns.
 		return name && name.block !== props.only
-			? [{ block: name.block, title: props.table.title || name.title, columns: [name] }, ...own]
+			? [
+					{
+						block: name.block,
+						title: props.table.title || name.title,
+						columns: [name],
+					},
+					...own,
+			  ]
 			: own
 	}
 	return groups.value.filter((g) => !hidden.value.has(g.block))
@@ -360,7 +396,9 @@ const rows = computed(() =>
 const rowMissing = (row: DocRow): number =>
 	scope.value.columns.filter((c) => isMissing(c, row)).length
 
-const missingRows = computed(() => props.table.rows.filter((r) => rowMissing(r) > 0).length)
+const missingRows = computed(
+	() => props.table.rows.filter((r) => rowMissing(r) > 0).length
+)
 
 const flagCount = (key: string): number =>
 	props.table.rows.filter((r) => r[key] === true).length
@@ -387,7 +425,8 @@ function requiredTitle(column: DocColumn): string {
 }
 
 function widthClass(column: DocColumn): string {
-	if (['scale', 'number', 'formula', 'check'].includes(column.type)) return 'w-narrow'
+	if (['scale', 'number', 'formula', 'check'].includes(column.type))
+		return 'w-narrow'
 	if (['date', 'select', 'ref'].includes(column.type)) return 'w-mid'
 	return 'w-wide'
 }

@@ -17,9 +17,25 @@ import {
 // learning-services#331: the risk register as the page arranges it.
 
 const block = (key: string, title: string): DocBlock =>
-	({ key, title, hint: '', lesson: null, span: 1, kind: 'text', accept: [], content: '', file: null, url: null, preview: null }) as DocBlock
+	({
+		key,
+		title,
+		hint: '',
+		lesson: null,
+		span: 1,
+		kind: 'text',
+		accept: [],
+		content: '',
+		file: null,
+		url: null,
+		preview: null,
+	} as DocBlock)
 
-const blocks = [block('risks', 'Риски'), block('assessment', 'Оценка'), block('responses', 'Ответы')]
+const blocks = [
+	block('risks', 'Риски'),
+	block('assessment', 'Оценка'),
+	block('responses', 'Ответы'),
+]
 
 const scale: DocTable = {
 	name: 'probability_scale',
@@ -30,7 +46,12 @@ const scale: DocTable = {
 	markdown: '',
 	columns: [
 		{ key: 'score', title: 'Балл', type: 'number', block: 'probability_scale' },
-		{ key: 'level', title: 'Уровень', type: 'text', block: 'probability_scale' },
+		{
+			key: 'level',
+			title: 'Уровень',
+			type: 'text',
+			block: 'probability_scale',
+		},
 	],
 	rows: [
 		{ id: 'P1', score: 1, level: 'Редко' },
@@ -46,28 +67,93 @@ const register: DocTable = {
 	markdown: '',
 	views: [
 		{ type: 'matrix', x: 'impact', y: 'probability', highlight: 'in_work' },
-		{ type: 'report', filter: 'sponsor', columns: ['event', 'rank'], field: 'next_report' },
+		{
+			type: 'report',
+			filter: 'sponsor',
+			columns: ['event', 'rank'],
+			field: 'next_report',
+		},
 	],
 	columns: [
-		{ key: 'event', title: 'Событие', type: 'text', block: 'risks', required: true },
-		{ key: 'kind', title: 'Вид', type: 'select', block: 'risks', options: ['угроза', 'возможность'] },
-		{ key: 'probability', title: 'Вероятность', type: 'scale', block: 'assessment', min: 1, max: 5, labels: 'probability_scale', required: true },
-		{ key: 'impact', title: 'Влияние', type: 'scale', block: 'assessment', min: 1, max: 5, required: true },
+		{
+			key: 'event',
+			title: 'Событие',
+			type: 'text',
+			block: 'risks',
+			required: true,
+		},
+		{
+			key: 'kind',
+			title: 'Вид',
+			type: 'select',
+			block: 'risks',
+			options: ['угроза', 'возможность'],
+		},
+		{
+			key: 'probability',
+			title: 'Вероятность',
+			type: 'scale',
+			block: 'assessment',
+			min: 1,
+			max: 5,
+			labels: 'probability_scale',
+			required: true,
+		},
+		{
+			key: 'impact',
+			title: 'Влияние',
+			type: 'scale',
+			block: 'assessment',
+			min: 1,
+			max: 5,
+			required: true,
+		},
 		{ key: 'rank', title: 'Ранг', type: 'formula', block: 'assessment' },
 		{ key: 'in_work', title: 'В работе', type: 'formula', block: 'assessment' },
-		{ key: 'measure', title: 'Мера', type: 'text', block: 'responses', required: 'in_work' },
+		{
+			key: 'measure',
+			title: 'Мера',
+			type: 'text',
+			block: 'responses',
+			required: 'in_work',
+		},
 		{ key: 'sponsor', title: 'Спонсору', type: 'check', block: 'responses' },
 	],
 	rows: [
-		{ id: 'R1', event: 'Подрядчик уйдёт', kind: 'угроза', probability: 4, impact: 4, rank: 16, in_work: true, sponsor: true },
-		{ id: 'R2', event: 'Отпуск Анны', kind: 'угроза', probability: 2, impact: 3, rank: 6, in_work: false },
-		{ id: 'R10', event: 'Готовый модуль', kind: 'возможность', measure: 'уточнить у Игоря', in_work: null },
+		{
+			id: 'R1',
+			event: 'Подрядчик уйдёт',
+			kind: 'угроза',
+			probability: 4,
+			impact: 4,
+			rank: 16,
+			in_work: true,
+			sponsor: true,
+		},
+		{
+			id: 'R2',
+			event: 'Отпуск Анны',
+			kind: 'угроза',
+			probability: 2,
+			impact: 3,
+			rank: 6,
+			in_work: false,
+		},
+		{
+			id: 'R10',
+			event: 'Готовый модуль',
+			kind: 'возможность',
+			measure: 'уточнить у Игоря',
+			in_work: null,
+		},
 	],
 }
 
 describe('columns and rows', () => {
 	it('groups columns under the block that adds them', () => {
-		expect(columnGroups(register, blocks).map((g) => [g.title, g.columns.length])).toEqual([
+		expect(
+			columnGroups(register, blocks).map((g) => [g.title, g.columns.length])
+		).toEqual([
 			['Риски', 2],
 			['Оценка', 4],
 			['Ответы', 2],
@@ -92,15 +178,34 @@ describe('columns and rows', () => {
 	})
 
 	it('filters by flag, by empty cells and by text', () => {
-		expect(filterRows(register, { flag: 'in_work' }).map((r) => r.id)).toEqual(['R1'])
-		expect(filterRows(register, { missing: true }).map((r) => r.id)).toEqual(['R1', 'R10'])
-		expect(filterRows(register, { search: 'анны' }).map((r) => r.id)).toEqual(['R2'])
+		expect(filterRows(register, { flag: 'in_work' }).map((r) => r.id)).toEqual([
+			'R1',
+		])
+		expect(filterRows(register, { missing: true }).map((r) => r.id)).toEqual([
+			'R1',
+			'R10',
+		])
+		expect(filterRows(register, { search: 'анны' }).map((r) => r.id)).toEqual([
+			'R2',
+		])
 	})
 
 	it('sorts numbers, IDs by their number, blanks last', () => {
-		expect(sortRows(register.rows, 'rank', 'desc').map((r) => r.id)).toEqual(['R1', 'R2', 'R10'])
-		expect(sortRows(register.rows, 'id', 'desc').map((r) => r.id)).toEqual(['R10', 'R2', 'R1'])
-		expect(sortRows(register.rows, 'rank', 'asc').map((r) => r.id)).toEqual(['R2', 'R1', 'R10'])
+		expect(sortRows(register.rows, 'rank', 'desc').map((r) => r.id)).toEqual([
+			'R1',
+			'R2',
+			'R10',
+		])
+		expect(sortRows(register.rows, 'id', 'desc').map((r) => r.id)).toEqual([
+			'R10',
+			'R2',
+			'R1',
+		])
+		expect(sortRows(register.rows, 'rank', 'asc').map((r) => r.id)).toEqual([
+			'R2',
+			'R1',
+			'R10',
+		])
 	})
 })
 
@@ -114,8 +219,24 @@ describe('pickers and text', () => {
 	})
 
 	it('offers a reference by the row it points at', () => {
-		const goals: DocTable = { ...scale, name: 'goals', columns: [{ key: 'goal', title: 'Цель', type: 'text', block: 'goals', required: true }], rows: [{ id: 'G1', goal: 'Запуск до сезона' }] }
-		const options = cellOptions({ key: 'goal', title: 'Цель', type: 'ref', block: 'risks', ref: 'goals' }, { goals })
+		const goals: DocTable = {
+			...scale,
+			name: 'goals',
+			columns: [
+				{
+					key: 'goal',
+					title: 'Цель',
+					type: 'text',
+					block: 'goals',
+					required: true,
+				},
+			],
+			rows: [{ id: 'G1', goal: 'Запуск до сезона' }],
+		}
+		const options = cellOptions(
+			{ key: 'goal', title: 'Цель', type: 'ref', block: 'risks', ref: 'goals' },
+			{ goals }
+		)
 		expect(options).toEqual([{ value: 'G1', label: 'G1 — Запуск до сезона' }])
 	})
 

@@ -55,7 +55,10 @@ export function useDocument(course: Ref<string>, artifact: Ref<string>) {
 	)
 	const saving = ref(0)
 
-	async function write(key: string, change: BlockWrite): Promise<WriteAnswer | null> {
+	async function write(
+		key: string,
+		change: BlockWrite
+	): Promise<WriteAnswer | null> {
 		saving.value++
 		try {
 			const result = (await call('lms_frappe_app.api.student.update_artifact', {
@@ -81,11 +84,19 @@ export function useDocument(course: Ref<string>, artifact: Ref<string>) {
 	}
 
 	/** One cell: shown at once, written, read back with the formulas. */
-	function setCell(block: string, table: string, row: DocRow, column: string, value: CellValue) {
+	function setCell(
+		block: string,
+		table: string,
+		row: DocRow,
+		column: string,
+		value: CellValue
+	) {
 		const rows = document.value?.tables[table]?.rows
 		const local = rows?.find((r) => r.id === row.id)
 		if (local) local[column] = value
-		return write(block, { rows: [{ id: row.id, [column]: value === '' ? null : value }] })
+		return write(block, {
+			rows: [{ id: row.id, [column]: value === '' ? null : value }],
+		})
 	}
 
 	function setField(block: string, key: string, value: CellValue) {
@@ -118,8 +129,8 @@ export function useDocument(course: Ref<string>, artifact: Ref<string>) {
 					body: form,
 					headers: {
 						Accept: 'application/json',
-						'X-Frappe-CSRF-Token': (window as Window & { csrf_token?: string })
-							.csrf_token ?? '',
+						'X-Frappe-CSRF-Token':
+							(window as Window & { csrf_token?: string }).csrf_token ?? '',
 					},
 				}
 			)

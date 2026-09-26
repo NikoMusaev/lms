@@ -11,12 +11,15 @@
 			<div class="min-w-0 flex-1">
 				<div
 					class="grid gap-1"
-					:style="{ gridTemplateColumns: `1.5rem repeat(${grid.xs.length}, minmax(0, 1fr))` }"
+					:style="{
+						gridTemplateColumns: `1.5rem repeat(${grid.xs.length}, minmax(0, 1fr))`,
+					}"
 				>
 					<template v-for="(line, i) in grid.cells" :key="i">
-						<span class="self-center text-center text-p-xs text-ink-gray-5 tabular-nums">{{
-							grid.ys[i]
-						}}</span>
+						<span
+							class="self-center text-center text-p-xs text-ink-gray-5 tabular-nums"
+							>{{ grid.ys[i] }}</span
+						>
 						<div
 							v-for="cell in line"
 							:key="`${cell.x}-${cell.y}`"
@@ -47,12 +50,16 @@
 						>{{ x }}</span
 					>
 				</div>
-				<div class="mt-1 text-center text-p-xs text-ink-gray-5">{{ xTitle }}</div>
+				<div class="mt-1 text-center text-p-xs text-ink-gray-5">
+					{{ xTitle }}
+				</div>
 			</div>
 		</div>
 		<p v-if="grid.unplaced.length" class="text-p-xs text-ink-gray-5">
 			{{
-				__('Not scored yet: {0}').format(grid.unplaced.map((r) => r.id).join(', '))
+				__('Not scored yet: {0}').format(
+					grid.unplaced.map((r) => r.id).join(', ')
+				)
 			}}
 		</p>
 	</figure>
@@ -79,7 +86,9 @@ const yTitle = computed(() => columnTitle(props.view.y))
 const name = computed(() => titleColumn(props.table))
 
 const rowTitle = (row: DocRow): string =>
-	name.value && row[name.value.key] ? `${row.id} — ${row[name.value.key]}` : row.id
+	name.value && row[name.value.key]
+		? `${row.id} — ${row[name.value.key]}`
+		: row.id
 
 // A quiet gradient by the product: the matrix sorts, it does not alarm.
 const max = computed(

@@ -3,7 +3,12 @@
 		<label v-for="field in fields" :key="field.key" class="block space-y-1">
 			<span class="flex items-center gap-1 text-p-sm text-ink-gray-7">
 				{{ field.title }}
-				<span v-if="field.required" class="text-ink-red-4" :title="__('Required')">*</span>
+				<span
+					v-if="field.required"
+					class="text-ink-red-4"
+					:title="__('Required')"
+					>*</span
+				>
 			</span>
 			<select
 				v-if="field.type === 'select'"
@@ -31,7 +36,7 @@
 				:class="{ 'is-missing': missing(field) }"
 				:value="values[field.key] ?? ''"
 				@change="save(field, ($event.target as HTMLInputElement).value)"
-				@keydown.enter.prevent="($event.target as HTMLInputElement).blur()"
+				@keydown.enter.prevent=";($event.target as HTMLInputElement).blur()"
 			/>
 		</label>
 	</div>
@@ -47,7 +52,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{ save: [key: string, value: CellValue] }>()
 
-const missing = (field: DocField) => Boolean(field.required) && isBlank(props.values[field.key])
+const missing = (field: DocField) =>
+	Boolean(field.required) && isBlank(props.values[field.key])
 
 function save(field: DocField, raw: string) {
 	const value = raw.trim()

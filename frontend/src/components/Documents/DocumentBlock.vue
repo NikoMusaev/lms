@@ -26,7 +26,9 @@
 			<summary class="cursor-pointer text-p-sm text-ink-gray-6">
 				{{ __('When the block is done') }}
 			</summary>
-			<p class="mt-1 text-p-sm leading-relaxed text-ink-gray-6">{{ block.hint }}</p>
+			<p class="mt-1 text-p-sm leading-relaxed text-ink-gray-6">
+				{{ block.hint }}
+			</p>
 		</details>
 
 		<div v-if="block.fields?.length" class="mt-4">
@@ -104,9 +106,12 @@
 		<!-- File and link blocks: the file itself, the address. -->
 		<div v-if="block.kind === 'file'" class="mt-4 space-y-2">
 			<p v-if="block.file" class="text-p-sm text-ink-gray-8">
-				<a :href="safeUrl(block.file.url)" download class="font-medium underline underline-offset-2">{{
-					block.file.name
-				}}</a>
+				<a
+					:href="safeUrl(block.file.url)"
+					download
+					class="font-medium underline underline-offset-2"
+					>{{ block.file.name }}</a
+				>
 			</p>
 			<p v-else class="text-p-sm text-ink-gray-5">{{ __('No file yet.') }}</p>
 			<label class="inline-flex cursor-pointer">
@@ -116,12 +121,16 @@
 					:accept="block.accept.map((a) => `.${a}`).join(',') || undefined"
 					@change="onFile"
 				/>
-				<span class="rounded bg-surface-gray-2 px-3 py-1.5 text-p-sm font-medium text-ink-gray-8">
+				<span
+					class="rounded bg-surface-gray-2 px-3 py-1.5 text-p-sm font-medium text-ink-gray-8"
+				>
 					{{ block.file ? __('Replace the file') : __('Upload a file') }}
 				</span>
 			</label>
 			<details v-if="block.preview" class="text-p-sm">
-				<summary class="cursor-pointer text-ink-gray-6">{{ __('What the agent sees') }}</summary>
+				<summary class="cursor-pointer text-ink-gray-6">
+					{{ __('What the agent sees') }}
+				</summary>
 				<div
 					v-safe-html:rich="render(block.preview)"
 					class="prose prose-sm mt-2 max-w-none overflow-x-auto"
@@ -158,13 +167,22 @@
 				/>
 				<div class="flex items-center gap-2">
 					<Button variant="solid" :label="__('Save')" @click="saveText" />
-					<Button variant="ghost" :label="__('Cancel')" @click="editing = false" />
-					<span class="text-p-xs text-ink-gray-5">{{ __('Markdown works here') }}</span>
+					<Button
+						variant="ghost"
+						:label="__('Cancel')"
+						@click="editing = false"
+					/>
+					<span class="text-p-xs text-ink-gray-5">{{
+						__('Markdown works here')
+					}}</span>
 				</div>
 			</div>
 			<template v-else>
 				<div v-if="block.content" class="relative">
-					<p v-if="structured" class="mb-1 text-p-xs font-medium uppercase text-ink-gray-5">
+					<p
+						v-if="structured"
+						class="mb-1 text-p-xs font-medium uppercase text-ink-gray-5"
+					>
 						{{ __('Note') }}
 					</p>
 					<div
@@ -249,45 +267,62 @@ watch(
 	(value) => (url.value = value ?? '')
 )
 
-const structured = computed(
-	() => Boolean(props.block.fields?.length || props.block.columns?.length)
+const structured = computed(() =>
+	Boolean(props.block.fields?.length || props.block.columns?.length)
 )
 
 const ownTable = computed(() => {
-	const table = props.block.table ? props.document.tables[props.block.table] : null
+	const table = props.block.table
+		? props.document.tables[props.block.table]
+		: null
 	return table && table.owner === props.block.key ? table : null
 })
 
 const otherTable = computed(() => {
-	const table = props.block.table ? props.document.tables[props.block.table] : null
-	return table && table.owner !== props.block.key && props.block.columns?.length ? table : null
+	const table = props.block.table
+		? props.document.tables[props.block.table]
+		: null
+	return table && table.owner !== props.block.key && props.block.columns?.length
+		? table
+		: null
 })
 
 const tableTitle = computed(() => {
-	const table = props.block.table ? props.document.tables[props.block.table] : null
+	const table = props.block.table
+		? props.document.tables[props.block.table]
+		: null
 	return table?.title || props.block.table || ''
 })
 
-const filled = computed(() =>
-	props.block.filled ?? Boolean(props.block.content || props.block.file || props.block.url)
+const filled = computed(
+	() =>
+		props.block.filled ??
+		Boolean(props.block.content || props.block.file || props.block.url)
 )
 
 // Text written before the block had columns: it still counts, but it belongs
 // in the table.
 const legacy = computed(() => {
 	if (!props.block.columns?.length || !props.block.content) return false
-	const table = props.block.table ? props.document.tables[props.block.table] : null
+	const table = props.block.table
+		? props.document.tables[props.block.table]
+		: null
 	const own = props.block.columns.map((c) => c.key)
-	return !table?.rows.some((r) => own.some((k) => r[k] !== undefined && r[k] !== null && r[k] !== ''))
+	return !table?.rows.some((r) =>
+		own.some((k) => r[k] !== undefined && r[k] !== null && r[k] !== '')
+	)
 })
 
 const lessonLabel = computed(() =>
-	props.lessonNumber ? __('Built in lesson {0}').format(String(props.lessonNumber)) : ''
+	props.lessonNumber
+		? __('Built in lesson {0}').format(String(props.lessonNumber))
+		: ''
 )
 
 const status = computed(() => {
 	const missing = props.block.empty_cells?.length ?? 0
-	if (filled.value) return { label: __('Done'), class: 'bg-surface-green-2 text-ink-green-8' }
+	if (filled.value)
+		return { label: __('Done'), class: 'bg-surface-green-2 text-ink-green-8' }
 	if (missing)
 		return {
 			label: __('{0} to fill').format(String(missing)),
@@ -300,8 +335,15 @@ const reports = computed(() => {
 	const out: { table: string; title: string }[] = []
 	for (const table of Object.values(props.document.tables))
 		for (const view of table.views)
-			if (view.type === 'report' && (view as ReportView).filter && ownsReport(view as ReportView))
-				out.push({ table: table.name, title: view.title || __('Report for the sponsor') })
+			if (
+				view.type === 'report' &&
+				(view as ReportView).filter &&
+				ownsReport(view as ReportView)
+			)
+				out.push({
+					table: table.name,
+					title: view.title || __('Report for the sponsor'),
+				})
 	return out
 })
 
@@ -334,7 +376,8 @@ async function clearText() {
 }
 
 function saveUrl() {
-	if (url.value.trim()) props.api.write(props.block.key, { url: url.value.trim() })
+	if (url.value.trim())
+		props.api.write(props.block.key, { url: url.value.trim() })
 }
 
 async function onFile(event: Event) {
