@@ -10124,3 +10124,231 @@ msgstr "{0} разделов"
 #: frontend/src/utils/plural.ts
 msgid "{0} sections"
 msgstr "{0} раздела"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Add a note"
+msgstr "Добавить заметку"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Add a row"
+msgstr "Добавить строку"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "All documents"
+msgstr "Все документы"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Built in lesson {0}"
+msgstr "Собирается на уроке {0}"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Clear this block?"
+msgstr "Очистить блок?"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Columns"
+msgstr "Колонки"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Could not save"
+msgstr "Не удалось сохранить"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Could not upload the file"
+msgstr "Не удалось загрузить файл"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Course documents are built as you study and are visible only to you."
+msgstr "Документы курса собираются по ходу обучения и видны только вам."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Delete {0}"
+msgstr "Удалить {0}"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Delete {0} «{1}»?"
+msgstr "Удалить {0} «{1}»?"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Document contents"
+msgstr "Содержание документа"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Done"
+msgstr "Готово"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Download"
+msgstr "Скачать"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Edit text"
+msgstr "Изменить текст"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Empty"
+msgstr "Пусто"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Empty cells"
+msgstr "Пустые клетки"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Excel workbook (.xlsx)"
+msgstr "Книга Excel (.xlsx)"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Fill in"
+msgstr "Заполнить"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Filled {0} of {1}"
+msgstr "Заполнено {0} из {1}"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Link"
+msgstr "Ссылка"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Markdown (.md)"
+msgstr "Markdown (.md)"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Markdown works here"
+msgstr "Можно markdown"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Matrix: {0} × {1}"
+msgstr "Матрица: {0} × {1}"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "My documents"
+msgstr "Мои документы"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "No"
+msgstr "Нет"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "No file yet."
+msgstr "Файла пока нет."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "No rows are ticked for the report yet. Tick them in the table."
+msgstr "Для доклада пока ничего не отмечено. Отметьте строки в таблице."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "No rows match the filter"
+msgstr "Под фильтр ничего не подходит"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "No rows yet"
+msgstr "Строк пока нет"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "None of your courses builds a document yet. It will appear here once the course has one."
+msgstr "Ни один из ваших курсов пока не собирает документ. Он появится здесь, как только в курсе будет документ."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Not scored yet: {0}"
+msgstr "Ещё не оценены: {0}"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Print or save as PDF"
+msgstr "Печать или PDF"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Replace the file"
+msgstr "Заменить файл"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Report"
+msgstr "Доклад"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Report for the sponsor"
+msgstr "Доклад спонсору"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Required"
+msgstr "Обязательно"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Required when «{0}»"
+msgstr "Обязательно, если «{0}»"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Row actions"
+msgstr "Действия со строкой"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Save link"
+msgstr "Сохранить ссылку"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Saving…"
+msgstr "Сохраняю…"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Search the table"
+msgstr "Поиск по таблице"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "This document has no report."
+msgstr "У этого документа нет доклада."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "This document is not available: the course is not yours or the document is gone."
+msgstr "Документ недоступен: курс не ваш или документа больше нет."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "This was written as text before the table existed. Move it into the table with your agent, or by hand."
+msgstr "Это записано текстом, когда таблицы ещё не было. Перенесите записи в таблицу — с агентом или вручную."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Untitled"
+msgstr "Без названия"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Upload a file"
+msgstr "Загрузить файл"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "What the agent sees"
+msgstr "Что видит агент"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "When the block is done"
+msgstr "Когда блок готов"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Write"
+msgstr "Написать"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Yes"
+msgstr "Да"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "Your documents are visible only to you."
+msgstr "Ваши документы видны только вам."
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "empty"
+msgstr "пусто"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "none"
+msgstr "нет"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "{0} of {1} rows"
+msgstr "{0} из {1} строк"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "{0} to fill"
+msgstr "заполнить: {0}"
+
+#: frontend/src/pages/Documents/Document.vue
+msgid "The whole table «{0}»"
+msgstr "Вся таблица «{0}»"
